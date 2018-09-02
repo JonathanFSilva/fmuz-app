@@ -1,0 +1,37 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "description": "",
+  "private": false,
+  "main": "index.js",
+  "dependencies": {
+    "@material-ui/core": "3.0.1",
+    "@material-ui/icons": "3.0.1",
+    "axios": "0.18.0",
+    "blob": "0.0.4",
+    "chartist": "0.11.0",
+    "chartist-plugin-tooltip2": "https://github.com/ant7/chartist-plugin-tooltip2/tarball/2684ea61614ea04c8ca1cfcded05e2ddc34b4485",
+    "chartist-plugin-tooltips": "^0.0.17",
+    "classnames": "2.2.6",
+    "form-data": "2.3.2",
+    "jwt-decode": "2.2.0",
+    "moment": "2.22.2",
+    "react": "16.4.2",
+    "react-chartist": "0.13.1",
+    "react-dom": "16.4.2",
+    "react-files": "2.4.6",
+    "react-moment": "0.7.9",
+    "react-perfect-scrollbar": "1.1.1",
+    "react-router-dom": "4.3.1",
+    "react-scripts": "1.1.4",
+    "react-swipeable-views": "0.12.13",
+    "react-text-mask": "5.4.3",
+    "react-validation": "3.0.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

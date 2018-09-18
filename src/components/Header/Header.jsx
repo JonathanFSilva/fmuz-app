@@ -13,12 +13,10 @@ import Hidden from "@material-ui/core/Hidden";
 // @material-ui/icons
 import Menu from "@material-ui/icons/Menu";
 // core components
-// import HeaderLinks from "./HeaderLinks";
 import Button from "components/CustomButtons/Button";
 
-import headerStyle from "assets/jss/material-dashboard-react/components/headerStyle.jsx";
+import headerStyle from "../../assets/jss/material-dashboard-react/components/headerStyle.jsx";
 
-// const moment = require('moment');
 
 function Header({ ...props }) {
   function makeBrand() {
@@ -54,7 +52,9 @@ function Header({ ...props }) {
             {makeBrand()}
           </Button>
         </div>
-        <Moment format="dddd, D [de] MMMM [de] YYYY - HH:mm:ss" locale="pt-br" interval={1000}></Moment>
+        <Hidden smDown implementation="css">
+          <Moment format="dddd, D [de] MMMM [de] YYYY - HH:mm:ss" locale="pt-br" interval={1000}></Moment>
+        </Hidden>
       </Toolbar>
     </AppBar>
   );

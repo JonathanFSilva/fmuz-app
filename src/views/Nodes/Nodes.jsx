@@ -13,24 +13,25 @@ import Grid from "@material-ui/core/Grid";
 import Tooltip from "@material-ui/core/Tooltip";
 // @material-ui/icons
 import Add from "@material-ui/icons/Add";
+import AddAlert from "@material-ui/icons/AddAlert";
 import Check from "@material-ui/icons/Check";
 import Close from "@material-ui/icons/Close";
 // core components
-import Button from "components/CustomButtons/Button";
-import Card from "components/Card/Card.jsx";
-import CardHeader from "components/Card/CardHeader.jsx";
-import CardIcon from "components/Card/CardIcon.jsx";
-import CardBody from "components/Card/CardBody.jsx";
-import GridItem from "components/Grid/GridItem.jsx";
+import Button from "../../components/CustomButtons/Button";
+import Card from "../../components/Card/Card.jsx";
+import CardHeader from "../../components/Card/CardHeader.jsx";
+import CardIcon from "../../components/Card/CardIcon.jsx";
+import CardBody from "../../components/Card/CardBody.jsx";
+import DataTable from "../../components/Table/DataTable.jsx";
+import GridItem from "../../components/Grid/GridItem.jsx";
+import Snackbar from "../../components/Snackbar/Snackbar";
 
-import DataTable from "components/Table/DataTable.jsx";
 import NodesFormModal from "./NodesFormModal.jsx";
 
-import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import NodeService from "../../services/nodes";
+import withAdmin from "../../hocs/withAdmin";
 
-import withAdmin from "hocs/withAdmin";
-
-import NodeService from "services/nodes";
+import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
 
 class Nodes extends React.Component {
@@ -42,11 +43,28 @@ class Nodes extends React.Component {
       confirmDeleteOpen: false,
       modalFormOpen: false,
       modalType: '',
+      notificationOpen: false,
+      notificationColor: 'danger',
+      notificationPlace: 'tr',
+      notificationMessage: ''
     };
   }
 
   componentDidMount = async () => {
     await this.getAllNodes();
+  };
+
+  showNotification = (message, color, place = 'tr') => {
+    this.setState({
+      notificationOpen: true,
+      notificationMessage: message,
+      notificationColor: color,
+      notificationPlace: place
+    });
+
+    setTimeout(() => {
+      this.setState({ notificationOpen: false, notificationMessage: '', });
+    }, 6000);
   };
 
   getAllNodes = async () => {
@@ -59,21 +77,19 @@ class Nodes extends React.Component {
         });
 
         this.setState({ nodes });
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+      });
   };
 
   deleteNode = async () => {
     await this.nodeService.delete(this.state.deleteId)
-      .then(({ data }) => {
+      .then(() => {
         this.setState({ deleteId: undefined });
         this.getAllNodes();
         this.handleCloseConfirmDelete();
+        this.showNotification('Nó excluido com sucesso!', 'success', 'tr');
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        this.showNotification('Não foi possível excluir o nó!', 'danger', 'tr');
       })
   };
 
@@ -107,6 +123,16 @@ class Nodes extends React.Component {
           modalType={this.state.modalType}
           nodeId={this.state.updateId || undefined}
           handleClose={() => this.handleClose()}
+          showNotification={this.showNotification}
+        />
+        <Snackbar
+          place={this.state.notificationPlace}
+          color={this.state.notificationColor}
+          message={this.state.notificationMessage}
+          icon={AddAlert}
+          open={this.state.notificationOpen}
+          closeNotification={() => this.setState({ notificationOpen: false })}
+          close
         />
         <Grid container alignItems="center" justify="center">
           <GridItem xs={12} sm={12} md={12}>
@@ -146,11 +172,10 @@ class Nodes extends React.Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Deseja mesmo sair?"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{"Confirmação"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              {"Let Google help apps determine location. This means sending anonymous location data to \
-            Google, even when no apps are running."}
+              {"Voçê deseja realmente excluir este registro?"}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

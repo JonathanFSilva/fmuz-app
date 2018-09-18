@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from "react";
 import PropTypes from "prop-types";
 import { withRouter, Switch, Route, Redirect } from "react-router-dom";
@@ -8,16 +7,15 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 // core components
-import Header from "components/Header/Header.jsx";
-import Footer from "components/Footer/Footer.jsx";
-import Sidebar from "components/Sidebar/Sidebar.jsx";
+import Header from "../../components/Header/Header.jsx";
+import Footer from "../../components/Footer/Footer.jsx";
+import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 
-import dashboardRoutes from "routes/dashboard.jsx";
+import dashboardRoutes from "../../routes/dashboard.jsx";
 
-import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
-
-import backgroundImage from "assets/img/sidebar.jpg";
-import logoIF from "assets/img/IF.png";
+import dashboardStyle from "../../assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
+import backgroundImage from "../../assets/img/sidebar.jpg";
+import logoIF from "../../assets/img/IF.png";
 
 
 const switchRoutes = (
@@ -74,7 +72,7 @@ class App extends React.Component {
       <div className={classes.wrapper}>
         <Sidebar
           routes={dashboardRoutes}
-          logoText={"APP"}
+          logoText={"FRUTICULTURA"}
           logo={logoIF}
           image={backgroundImage}
           handleDrawerToggle={this.handleDrawerToggle}

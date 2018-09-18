@@ -1,11 +1,8 @@
-/* eslint-disable */
 import React from "react";
 import PropTypes from "prop-types";
-// Perfect scroolbar
-import "react-perfect-scrollbar/dist/css/styles.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
+import Dialog from "@material-ui/core/Dialog";
 import Grid from "@material-ui/core/Grid";
 import InputAdornment from "@material-ui/core/InputAdornment";
 // @material-ui/icons
@@ -14,20 +11,20 @@ import Email from "@material-ui/icons/Email";
 import Lock from "@material-ui/icons/Lock";
 import Slide from "@material-ui/core/Slide";
 // core components
-import Button from "components/CustomButtons/Button";
-import Card from "components/Card/Card";
-import CardBody from "components/Card/CardBody";
-import CardHeader from "components/Card/CardHeader";
-import CardFooter from "components/Card/CardFooter";
-import CustomInput from "components/CustomInput/CustomInput";
-import Dialog from "@material-ui/core/Dialog";
-// import GridContainer from "components/Grid/GridContainer";
-import GridItem from "components/Grid/GridItem";
-import Snackbar from "components/Snackbar/Snackbar";
+import Button from "../../components/CustomButtons/Button";
+import Card from "../../components/Card/Card";
+import CardBody from "../../components/Card/CardBody";
+import CardHeader from "../../components/Card/CardHeader";
+import CustomInput from "../../components/CustomInput/CustomInput";
+import GridItem from "../../components/Grid/GridItem";
+import Snackbar from "../../components/Snackbar/Snackbar";
 
-import background from "assets/img/sidebar.jpg";
+import background from "../../assets/img/sidebar.jpg";
 
-import AuthService from "services/auth";
+import FormValidator from "../../validations/FormValidator";
+
+import AuthService from "../../services/auth";
+
 
 const styles = () => ({
   background: {
@@ -52,12 +49,30 @@ class Login extends React.Component {
   constructor() {
     super();
     this.authService = new AuthService();
+    this.validator = new FormValidator([
+      {
+        field: 'username',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'password',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      }
+    ]);
     this.state = {
+      username: '',
+      password: '',
       notificationOpen: false,
       notificationColor: 'danger',
       notificationPlace: 'tr',
-      notificationMessage: ''
-    }
+      notificationMessage: '',
+      validation: this.validator.valid()
+    };
+    this.submited = false;
   }
 
   componentWillMount = () => {
@@ -72,36 +87,41 @@ class Login extends React.Component {
       notificationMessage: message,
       notificationColor: color,
       notificationPlace: place
-    }, () => {console.log(this.state)});
+    });
 
     setTimeout(() => {
-      this.setState({
-        notificationOpen: false,
-        notificationMessage: '',
-        notificationColor: 'danger',
-        notificationPlace: 'tr',
-      });
+      this.setState({ notificationOpen: false, notificationMessage: '', });
     }, 6000);
   };
 
-  onFormSubmit = async (e) => {
-    e.preventDefault();
+  onFormSubmit = async (event) => {
+    event.preventDefault();
 
-    try {
-      await this.authService.login(this.state.username, this.state.password);
-      this.props.history.replace('/');
-    } catch (err) {
-      // console.log(err.data);
-      this.showNotification('Falha na autenticação!', 'danger');
+    const validation = this.validator.validate(this.state);
+    this.setState({ validation });
+    this.submited = true;
+
+    if (validation.isValid) {
+      try {
+        await this.authService.login(this.state.username, this.state.password);
+        this.props.history.replace('/');
+      } catch (err) {
+        this.showNotification('Falha na autenticação!', 'danger');
+      }
     }
   };
 
-  handleInputChange = (e) => {
-    this.setState({ [e.target.id]: e.target.value });
+  handleInputChange = (event) => {
+    event.preventDefault();
+
+    this.setState({ [event.target.id]: event.target.value });
   };
 
   render() {
     const { classes } = this.props;
+
+    const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
+
     return (
       <div className={classes.background}>
         <Snackbar
@@ -118,6 +138,7 @@ class Login extends React.Component {
           <Dialog
             keepMounted
             open={true}
+            scroll="body"
             TransitionComponent={Transition}
             disableBackdropClick={true}
             disableEscapeKeyDown={true}
@@ -125,24 +146,29 @@ class Login extends React.Component {
               style: {
                 backgroundColor: "transparent",
                 boxShadow: "none",
-                minHeight: "300px"
+                minHeight: "300px",
+                maxWidth: "300px"
               }
             }}
           >
             <Card>
-              <CardHeader color="success">
+              <CardHeader color="success" style={{ padding: "0" }}>
                 <center><h3>Login</h3></center>
               </CardHeader>
-
-              <PerfectScrollbar>
-
+              <form autoComplete="off">
                 <CardBody>
-                  <Grid>
+                  <Grid container justify="center">
                     <GridItem>
                       <CustomInput
                         id="username"
                         labelText="Usuario"
-                        formControlProps={{ fullWidth: true }}
+                        error={validation.username.isInvalid}
+                        helperText={validation.username.message}
+                        formControlProps={{
+                          error: validation.username.isInvalid,
+                          required: true,
+                          fullWidth: true
+                        }}
                         inputProps={
                           {
                             endAdornment: (
@@ -151,10 +177,8 @@ class Login extends React.Component {
                               </InputAdornment>
                             ),
                             autoFocus: true,
-                            autoComplete: "off",
                             onChange: this.handleInputChange,
                             type: "text",
-                            required: true
                           }
                         }
                       />
@@ -163,7 +187,13 @@ class Login extends React.Component {
                       <CustomInput
                         id="password"
                         labelText="Senha"
-                        formControlProps={{ fullWidth: true }}
+                        error={validation.password.isInvalid}
+                        helperText={validation.password.message}
+                        formControlProps={{ 
+                          error: validation.password.isInvalid,
+                          required: true,
+                          fullWidth: true 
+                        }}
                         inputProps={
                           {
                             endAdornment: (
@@ -174,7 +204,6 @@ class Login extends React.Component {
                             onKeyPress: (event) => { event.key === "Enter" ? this.onFormSubmit(event) : null },
                             onChange: this.handleInputChange,
                             type: "password",
-                            required: true
                           }
                         }
                       />
@@ -188,8 +217,7 @@ class Login extends React.Component {
                     </GridItem>
                   </Grid>
                 </CardBody>
-
-              </PerfectScrollbar>
+              </form>
             </Card>
           </Dialog>
         </Grid>

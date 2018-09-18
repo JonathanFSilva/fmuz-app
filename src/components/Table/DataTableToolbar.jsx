@@ -1,15 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 // @material-ui/core components
-import { withStyles } from '@material-ui/core/styles';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
+import { withStyles } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "@material-ui/core/Tooltip";
 // material-ui/icons 
-import DeleteIcon from '@material-ui/icons/Delete';
-import Add from '@material-ui/icons/Add';
-
-import tableStyle from "assets/jss/material-dashboard-react/components/tableStyle";
+import Add from "@material-ui/icons/Add";
 
 
 const toolbarStyles = theme => ({
@@ -22,7 +19,7 @@ const toolbarStyles = theme => ({
 });
 
 let DataTableToolbar = props => {
-  const { numSelected, classes } = props;
+  const { classes } = props;
 
   return (
     <Toolbar>

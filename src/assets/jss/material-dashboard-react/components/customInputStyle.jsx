@@ -39,10 +39,10 @@ const customInputStyle = {
     lineHeight: "1.42857"
   },
   labelRootError: {
-    color: dangerColor
+    color: dangerColor + " !important"
   },
   labelRootSuccess: {
-    color: successColor
+    color: successColor + " !important"
   },
   feedback: {
     position: "absolute",

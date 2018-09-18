@@ -26,7 +26,8 @@
     "react-scripts": "1.1.4",
     "react-swipeable-views": "0.12.13",
     "react-text-mask": "5.4.3",
-    "react-validation": "3.0.7"
+    "react-validation": "3.0.7",
+    "validator": "^10.7.1"
   },
   "scripts": {
     "start": "react-scripts start",

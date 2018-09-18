@@ -265,3 +265,12 @@ footer ul li a:hover {
 	position: absolute;
 	z-index: -1;
 }
+
+.icon {
+  width: 36px;
+  height: 36px;
+  margin: 10px 10px 4px;
+  font-size: 36px;
+  text-align: center;
+  line-height: 56px;
+}

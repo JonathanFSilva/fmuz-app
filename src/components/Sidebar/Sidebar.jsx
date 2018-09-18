@@ -15,11 +15,12 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Icon from "@material-ui/core/Icon";
 
-import sidebarStyle from "assets/jss/material-dashboard-react/components/sidebarStyle.jsx";
-import userImage from "assets/img/faces/user.jpeg";
+import sidebarStyle from "../../assets/jss/material-dashboard-react/components/sidebarStyle.jsx";
+import userImage from "../../assets/img/faces/user.jpeg";
 import UserContent from "./UserContent";
 
-import AuthService from "services/auth";
+import AuthService from "../../services/auth";
+
 
 const authService = new AuthService();
 
@@ -80,7 +81,7 @@ const Sidebar = ({ ...props }) => {
 
   var brand = (
     <div className={classes.logo}>
-      <a href="http://localhost:3000" className={classes.logoLink}>
+      <a href="http://18.231.25.86/" className={classes.logoLink}>
         <div className={classes.logoImage}>
           <img src={logo} alt="logo" style={{ width: "25px" }} />
         </div>

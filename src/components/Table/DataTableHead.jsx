@@ -1,15 +1,16 @@
-import React from 'react';
+import React from "react";
 import classNames from "classnames";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // @material-ui/core components
-import { withStyles } from '@material-ui/core/styles';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Tooltip from '@material-ui/core/Tooltip';
+import { withStyles } from "@material-ui/core/styles";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import Tooltip from "@material-ui/core/Tooltip";
 
-import tableStyle from "assets/jss/material-dashboard-react/components/tableStyle";
+import tableStyle from "../../assets/jss/material-dashboard-react/components/tableStyle.jsx";
+
 
 class DataTableHead extends React.PureComponent {
   createSortHandler = property => event => {

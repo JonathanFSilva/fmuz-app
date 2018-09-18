@@ -6,7 +6,9 @@ import ChartistGraph from "react-chartist";
 
 var Chartist = require("chartist");
 var Moment = require("moment");
+
 require("chartist-plugin-tooltips");
+
 
 const LineChart = ({ ...props }) => {
   const { data, labelX, labelY, serie } = props;

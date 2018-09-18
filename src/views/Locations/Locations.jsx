@@ -1,36 +1,37 @@
 import React from "react";
 import PropTypes from "prop-types";
 // react moment
-import Moment from 'react-moment';
+import Moment from "react-moment";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import Grid from "@material-ui/core/Grid";
 import Tooltip from "@material-ui/core/Tooltip";
 // @material-ui/icons
 import Add from "@material-ui/icons/Add";
+import AddAlert from "@material-ui/icons/AddAlert";
 import Check from "@material-ui/icons/Check";
 import Close from "@material-ui/icons/Close";
 // core components
-import Button from "components/CustomButtons/Button";
-import Card from "components/Card/Card.jsx";
-import CardHeader from "components/Card/CardHeader.jsx";
-import CardIcon from "components/Card/CardIcon.jsx";
-import CardBody from "components/Card/CardBody.jsx";
-import GridItem from "components/Grid/GridItem.jsx";
+import Button from "../../components/CustomButtons/Button";
+import Card from "../../components/Card/Card";
+import CardHeader from "../../components/Card/CardHeader";
+import CardIcon from "../../components/Card/CardIcon";
+import CardBody from "../../components/Card/CardBody";
+import DataTable from "../../components/Table/DataTable";
+import GridItem from "../../components/Grid/GridItem";
+import Snackbar from "../../components/Snackbar/Snackbar";
 
-import DataTable from "components/Table/DataTable.jsx";
 import LocationsFormModal from "./LocationsFormModal.jsx";
 
-import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import LocationService from "../../services/locations";
+import withAdmin from "../../hocs/withAdmin";
 
-import withAdmin from "hocs/withAdmin";
-
-import LocationService from "services/locations";
+import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle";
 
 
 class Locations extends React.Component {
@@ -42,11 +43,28 @@ class Locations extends React.Component {
       confirmDeleteOpen: false,
       modalFormOpen: false,
       modalType: '',
+      notificationOpen: false,
+      notificationColor: 'danger',
+      notificationPlace: 'tr',
+      notificationMessage: ''
     };
   }
 
   componentDidMount = async () => {
     await this.getAllLocations();
+  };
+
+  showNotification = (message, color, place = 'tr') => {
+    this.setState({
+      notificationOpen: true,
+      notificationMessage: message,
+      notificationColor: color,
+      notificationPlace: place
+    });
+
+    setTimeout(() => {
+      this.setState({ notificationOpen: false, notificationMessage: '', });
+    }, 6000);
   };
 
   getAllLocations = async () => {
@@ -59,21 +77,19 @@ class Locations extends React.Component {
         });
 
         this.setState({ locations });
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+      });
   };
 
   deleteLocation = async () => {
     await this.locationService.delete(this.state.deleteId)
-      .then(({ data }) => {
+      .then(() => {
         this.setState({ deleteId: undefined });
         this.getAllLocations();
         this.handleCloseConfirmDelete();
+        this.showNotification('Local excluido com sucesso!', 'success', 'tr');
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        this.showNotification('Não foi possível excluir o local!', 'danger', 'tr');
       })
   };
 
@@ -107,6 +123,16 @@ class Locations extends React.Component {
           modalType={this.state.modalType}
           locationId={this.state.updateId || undefined}
           handleClose={() => this.handleClose()}
+          showNotification={this.showNotification}
+        />
+        <Snackbar
+          place={this.state.notificationPlace}
+          color={this.state.notificationColor}
+          message={this.state.notificationMessage}
+          icon={AddAlert}
+          open={this.state.notificationOpen}
+          closeNotification={() => this.setState({ notificationOpen: false })}
+          close
         />
         <Grid container alignItems="center" justify="center">
           <GridItem xs={12} sm={12} md={12}>

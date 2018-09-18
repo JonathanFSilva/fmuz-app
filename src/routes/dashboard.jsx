@@ -5,11 +5,12 @@ import LocationOn from "@material-ui/icons/LocationOn"
 import SettingsRemote from "@material-ui/icons/SettingsRemote";
 import EventNote from "@material-ui/icons/EventNote";
 // core components/views
-import DashboardPage from "views/Dashboard/Dashboard.jsx";
-import ReportsPage from "views/Reports/Reports.jsx";
-import UsersPage from "views/Users/Users.jsx";
-import LocationsPage from "views/Locations/Locations.jsx";
-import NodesPage from "views/Nodes/Nodes.jsx";
+import DashboardPage from "../views/Dashboard/Dashboard.jsx";
+import ReportsPage from "../views/Reports/Reports.jsx";
+import UsersPage from "../views/Users/Users.jsx";
+import LocationsPage from "../views/Locations/Locations.jsx";
+import NodesPage from "../views/Nodes/Nodes.jsx";
+
 
 const dashboardRoutes = [
   {

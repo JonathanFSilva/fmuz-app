@@ -13,7 +13,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Edit from "@material-ui/icons/Edit";
 import Delete from "@material-ui/icons/Delete";
 
-import tableStyle from "assets/jss/material-dashboard-react/components/tableStyle";
+import tableStyle from "../../assets/jss/material-dashboard-react/components/tableStyle.jsx";
 
 import DataTableHead from "./DataTableHead.jsx";
 

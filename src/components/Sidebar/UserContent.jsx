@@ -15,9 +15,9 @@ import Check from "@material-ui/icons/Check";
 import Close from "@material-ui/icons/Close";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 // core components
-import Button from "components/CustomButtons/Button";
+import Button from "../../components/CustomButtons/Button";
 
-import AuthService from "services/auth";
+import AuthService from "../../services/auth";
 
 
 class UserContent extends Component {
@@ -82,11 +82,10 @@ class UserContent extends Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Deseja mesmo sair?"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{"Confirmação"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              {"Let Google help apps determine location. This means sending anonymous location data to \
-            Google, even when no apps are running."}
+              {"Você deseja realmente sair da aplicação?"}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

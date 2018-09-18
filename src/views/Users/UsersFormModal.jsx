@@ -1,8 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-// Perfect scroolbar
-import "react-perfect-scrollbar/dist/css/styles.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
 // form data
 import Blob from "blob";
 import Files from "react-files";
@@ -16,33 +13,33 @@ import Grid from "@material-ui/core/Grid";
 import Slide from "@material-ui/core/Slide";
 import Tooltip from "@material-ui/core/Tooltip";
 // @material-ui/icons
-// import AddAlert from "@material-ui/icons/AddAlert";
 import Check from "@material-ui/icons/Check";
 import Close from "@material-ui/icons/Close";
 import Save from "@material-ui/icons/Save";
 // core components
-import Button from "components/CustomButtons/Button";
-import Card from "components/Card/Card";
-import CardAvatar from "components/Card/CardAvatar";
-import CardBody from "components/Card/CardBody";
-import CardHeader from "components/Card/CardHeader";
-import CardFooter from "components/Card/CardFooter";
-import CustomInput from "components/CustomInput/CustomInput";
-import GridItem from "components/Grid/GridItem";
-// import Snackbar from "components/Snackbar/Snackbar";
+import Button from "../../components/CustomButtons/Button";
+import Card from "../../components/Card/Card";
+import CardAvatar from "../../components/Card/CardAvatar";
+import CardBody from "../../components/Card/CardBody";
+import CardHeader from "../../components/Card/CardHeader";
+import CardFooter from "../../components/Card/CardFooter";
+import CustomInput from "../../components/CustomInput/CustomInput";
+import GridItem from "../../components/Grid/GridItem";
 
-// import avatar from "assets/img/faces/user.png";
+import FormValidator from "../../validations/FormValidator";
+
+import UserService from "../../services/user";
+
 import checkboxAdnRadioStyle from "assets/jss/material-dashboard-react/checkboxAdnRadioStyle.jsx";
 
-import UserService from "services/user";
 
 const initialState = {
   name: '',
   email: '',
   username: '',
   password: '',
-  password1: '',
-  thumbnail: 'http://localhost:3333/api/users/images/user.jpeg',
+  password_confirmation: '',
+  thumbnail: 'http://18.231.25.86/api/users/images/user.jpeg',
   is_admin: false,
 }
 
@@ -51,12 +48,56 @@ function Transition(props) {
   return <Slide direction="down" {...props} />;
 }
 
-
 class UsersFormModal extends React.PureComponent {
   constructor() {
     super();
     this.userService = new UserService();
-    this.state = initialState;
+    this.validator = new FormValidator([
+      {
+        field: 'name',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'email',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'email',
+        method: 'isEmail',
+        validWhen: true,
+        message: 'O valor informado não é um e-mail válido'
+      },
+      {
+        field: 'username',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'password',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'password_confirmation',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'password_confirmation',
+        method: this.passwordMatch,
+        validWhen: true,
+        message: 'As senhas não combinam'
+      }
+    ]);
+    this.state = { ...initialState, validation: this.validator.valid() };
+    this.submited = false;
   }
 
   componentDidUpdate = async () => {
@@ -65,7 +106,7 @@ class UsersFormModal extends React.PureComponent {
         && this.state.email === ''
         && this.state.username === ''
         && this.state.password === ''
-        && this.state.password1 === ''
+        && this.state.password_confirmation === ''
       ) {
         await this.userService.getOne(this.props.userId)
           .then(({ data }) => {
@@ -74,23 +115,24 @@ class UsersFormModal extends React.PureComponent {
               email: data.email,
               username: data.username,
               password: '',
-              password1: '',
+              password_confirmation: '',
               thumbnail: data.url,
               is_admin: data.is_admin,
             });
-          })
-          .catch((err) => {
-            console.log(err);
-          })
+          });
       }
     }
   };
+
+  passwordMatch = (confirmation, state) => (state.password === confirmation)
 
   handleFileChange = (files) => {
     this.setState({ thumbnail: files[files.length - 1] });
   };
 
   handleInputChange = (event) => {
+    event.preventDefault();
+
     this.setState({ [event.target.id]: event.target.value });
   };
 
@@ -104,74 +146,96 @@ class UsersFormModal extends React.PureComponent {
     this.props.handleClose();
   }
 
-  formCreateSubmit = async (e) => {
-    e.preventDefault();
+  formCreateSubmit = async (event) => {
+    event.preventDefault();
 
-    const { name, email, username, password, is_admin, thumbnail } = this.state;
+    const validation = this.validator.validate(this.state);
+    this.setState({ validation });
+    this.submited = true;
 
-    const formData = new FormData();
+    if (validation.isValid) {
+      const { name, email, username, password, is_admin, thumbnail } = this.state;
 
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("username", username);
-    formData.append("password", password);
-    formData.append("is_admin", is_admin ? 1 : 0);
+      const formData = new FormData();
 
-    if (typeof thumbnail === 'string') {
-      formData.append("thumbnail", thumbnail);
-    } else {
-      formData.append("thumbnail", new Blob([thumbnail], { type: thumbnail.type }), thumbnail.name);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("username", username);
+      formData.append("password", password);
+      formData.append("is_admin", is_admin ? 1 : 0);
+
+      if (typeof thumbnail === 'string') {
+        formData.append("thumbnail", thumbnail);
+      } else {
+        formData.append("thumbnail", new Blob([thumbnail], { type: thumbnail.type }), thumbnail.name);
+      }
+
+      await this.userService.create(formData)
+        .then(() => {
+          this.submited = false;
+
+          this.setState(initialState);
+
+          this.props.handleClose();
+          this.props.showNotification('Usuário cadastrado com sucesso', 'success', 'tr');
+        })
+        .catch((err) => {
+          console.log(err);
+          this.props.showNotification('Não foi possível realizar o cadastro', 'danger', 'tr');
+        })
     }
-
-    await this.userService.create(formData)
-      .then(({ data }) => {
-        this.setState(initialState, () => { console.log(this.state); });
-
-        this.props.handleClose();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
 
   };
 
-  formEditSubmit = async (e) => {
-    e.preventDefault();
+  formEditSubmit = async (event) => {
+    event.preventDefault();
 
-    const { name, email, username, password, is_admin, thumbnail } = this.state;
+    const validation = this.validator.validate(this.state);
+    this.setState({ validation });
+    this.submited = true;
 
-    const formData = new FormData();
+    if (validation.isValid) {
+      const { name, email, username, password, is_admin, thumbnail } = this.state;
 
-    formData.append("id", this.props.userId);
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("username", username);
-    formData.append("is_admin", is_admin ? 1 : 0);
+      const formData = new FormData();
 
-    if (password !== '') {
-      formData.append("password", password);
+      formData.append("id", this.props.userId);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("username", username);
+      formData.append("is_admin", is_admin ? 1 : 0);
+
+      if (password !== '') {
+        formData.append("password", password);
+      }
+
+      if (typeof thumbnail === 'string') {
+        formData.append("thumbnail", thumbnail);
+      } else {
+        formData.append("thumbnail", new Blob([thumbnail], { type: thumbnail.type }), thumbnail.name);
+      }
+
+      await this.userService.update(formData)
+        .then(() => {
+          this.submited = false;
+
+          this.setState(initialState);
+
+          this.props.handleClose();
+          this.props.showNotification('Usuário atualizado com sucesso', 'success', 'tr');
+        })
+        .catch(() => {
+          this.props.showNotification('Não foi possível atualizar o cadastro', 'danger', 'tr');          
+        })
     }
 
-    if (typeof thumbnail === 'string') {
-      formData.append("thumbnail", thumbnail);
-    } else {
-      formData.append("thumbnail", new Blob([thumbnail], { type: thumbnail.type }), thumbnail.name);
-    }
-
-    await this.userService.update(formData)
-      .then(({ data }) => {
-        this.setState(initialState);
-
-        this.props.handleClose();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
   };
 
   render() {
     const { open, modalType, handleClose, classes } = this.props;
-    const { name, email, username, password, password1, is_admin, thumbnail } = this.state;
+    const { name, email, username, password, password_confirmation, is_admin, thumbnail } = this.state;
+
+    const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
 
     return (
       <div>
@@ -194,8 +258,7 @@ class UsersFormModal extends React.PureComponent {
             <CardHeader color="success" style={{ padding: "0", zIndex: "1500" }}>
               <center><h4>{`${modalType} Usuário`}</h4></center>
             </CardHeader>
-
-            <PerfectScrollbar>
+            <form autoComplete="off">
               <CardBody>
                 <Grid container justify="center">
                   <GridItem xs={12} sm={12} md={6}>
@@ -223,7 +286,10 @@ class UsersFormModal extends React.PureComponent {
                     <CustomInput
                       id="name"
                       labelText="Nome completo"
+                      error={validation.name.isInvalid}
+                      helperText={validation.name.message}
                       formControlProps={{
+                        error: validation.name.isInvalid,
                         required: true,
                         fullWidth: true,
                         style: { marginTop: "0px" }
@@ -240,7 +306,10 @@ class UsersFormModal extends React.PureComponent {
                     <CustomInput
                       id="email"
                       labelText="E-mail"
+                      error={validation.email.isInvalid}
+                      helperText={validation.email.message}
                       formControlProps={{
+                        error: validation.email.isInvalid,
                         required: true,
                         fullWidth: true,
                         style: { marginTop: "0px" }
@@ -256,7 +325,10 @@ class UsersFormModal extends React.PureComponent {
                     <CustomInput
                       id="username"
                       labelText="Login"
+                      error={validation.username.isInvalid}
+                      helperText={validation.username.message}
                       formControlProps={{
+                        error: validation.username.isInvalid,
                         required: true,
                         fullWidth: true,
                         style: { marginTop: "0px" }
@@ -272,7 +344,10 @@ class UsersFormModal extends React.PureComponent {
                     <CustomInput
                       id="password"
                       labelText="Senha"
+                      error={validation.password.isInvalid}
+                      helperText={validation.password.message}
                       formControlProps={{
+                        error: validation.password.isInvalid,
                         required: true,
                         fullWidth: true,
                         style: { marginTop: "0px" }
@@ -286,15 +361,18 @@ class UsersFormModal extends React.PureComponent {
                   </GridItem>
                   <GridItem xs={12} sm={12} md={5}>
                     <CustomInput
-                      id="password1"
+                      id="password_confirmation"
                       labelText="Confirme a senha"
+                      error={validation.password_confirmation.isInvalid}
+                      helperText={validation.password_confirmation.message}
                       formControlProps={{
+                        error: validation.password_confirmation.isInvalid,
                         required: true,
                         fullWidth: true,
                         style: { marginTop: "0px" }
                       }}
                       inputProps={{
-                        value: password1,
+                        value: password_confirmation,
                         onChange: this.handleInputChange,
                         type: "password",
                       }}
@@ -334,7 +412,7 @@ class UsersFormModal extends React.PureComponent {
                   <Save />
                 </Button>
               </CardFooter>
-            </PerfectScrollbar>
+            </form>
           </Card>
         </Dialog>
       </div>

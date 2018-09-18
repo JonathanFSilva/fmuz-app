@@ -1,4 +1,5 @@
-import LoginPage from "views/Login/Login";
+import LoginPage from "../views/Login/Login";
+
 
 const authRoutes = [
   { path: "/auth/authenticate", component: LoginPage },

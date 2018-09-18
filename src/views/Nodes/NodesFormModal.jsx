@@ -1,39 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
-// Perfect scroolbar
-import "react-perfect-scrollbar/dist/css/styles.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
-// form data
 import FormData from "form-data";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
+// import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import Slide from "@material-ui/core/Slide";
 // @material-ui/icons
-// import AddAlert from "@material-ui/icons/AddAlert";
 import Save from "@material-ui/icons/Save";
 import Close from "@material-ui/icons/Close";
 // core components
-import Button from "components/CustomButtons/Button";
-import Card from "components/Card/Card";
-import CardBody from "components/Card/CardBody";
-import CardHeader from "components/Card/CardHeader";
-import CardFooter from "components/Card/CardFooter";
-// import CustomInput from "components/CustomInput/CustomInput";
-import CustomMaskedInput from "components/CustomMaskedInput/CustomMaskedInput";
-import GridItem from "components/Grid/GridItem";
-// import Snackbar from "components/Snackbar/Snackbar";
+import Button from "../../components/CustomButtons/Button";
+import Card from "../../components/Card/Card";
+import CardBody from "../../components/Card/CardBody";
+import CardHeader from "../../components/Card/CardHeader";
+import CardFooter from "../../components/Card/CardFooter";
+// import CustomInput from "../../components/CustomInput/CustomInput";
+import CustomMaskedInput from "../../components/CustomMaskedInput/CustomMaskedInput";
+import GridItem from "../../components/Grid/GridItem";
 
-import customInputStyle from "assets/jss/material-dashboard-react/components/customInputStyle";
+import customInputStyle from "../../assets/jss/material-dashboard-react/components/customInputStyle";
 
+import FormValidator from "../../validations/FormValidator";
 
-import LocationService from "services/locations.js";
-import NodeService from "services/nodes.js";
+import LocationService from "../../services/locations.js";
+import NodeService from "../../services/nodes.js";
 
 const emptyState = {
   location_id: '',
@@ -56,7 +52,29 @@ class NodesFormModal extends React.Component {
     super();
     this.locationService = new LocationService();
     this.nodeService = new NodeService();
-    this.state = initialState;
+    this.validator = new FormValidator([
+      {
+        field: 'location_id',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'mac_address',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Campo obrigatório'
+      },
+      {
+        field: 'mac_address',
+        method: 'matches',
+        args: [/^[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}$/], 
+        validWhen: true,
+        message: 'Valor informado não é um endereço mac válido'
+      },
+    ]);
+    this.state = { ...initialState, validation: this.validator.valid() };
+    this.submited = false;
   }
 
   componentDidMount = async () => {
@@ -69,10 +87,7 @@ class NodesFormModal extends React.Component {
         await this.nodeService.getOne(this.props.nodeId)
           .then(({ data }) => {
             this.setState({ location_id: data.location_id, mac_address: data.mac_address });
-          })
-          .catch((err) => {
-            console.log(err);
-          })
+          });
       }
     }
   };
@@ -86,58 +101,76 @@ class NodesFormModal extends React.Component {
           locations.push([item.id, item.name]);
         });
 
-        this.setState({ locations });
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+        this.setState({ locations, location_id: locations[0][0] });
+      });
   };
 
-  formCreateSubmit = async (e) => {
-    e.preventDefault();
+  formCreateSubmit = async (event) => {
+    event.preventDefault();
 
-    const { location_id, mac_address } = this.state;
+    const validation = this.validator.validate(this.state);
+    this.setState({ validation });
+    this.submited = true;
 
-    const formData = new FormData();
+    if (validation.isValid) {
+      const { location_id, mac_address } = this.state;
 
-    formData.append("location_id", location_id);
-    formData.append("mac_address", mac_address);
+      const formData = new FormData();
 
-    await this.nodeService.create(formData)
-      .then(({ data }) => {
-        this.setState(emptyState);
+      formData.append("location_id", location_id);
+      formData.append("mac_address", mac_address);
 
-        this.props.handleClose();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+      await this.nodeService.create(formData)
+        .then(() => {
+          this.submited = false;
+
+          this.setState(emptyState);
+
+          this.props.handleClose();
+          this.props.showNotification('Nó cadastrado com sucesso', 'success', 'tr');
+        })
+        .catch(() => {
+          this.props.showNotification('Não foi possível realizar o cadastro', 'danger', 'tr');
+        });
+    }
 
   };
 
-  formEditSubmit = async (e) => {
-    e.preventDefault();
+  formEditSubmit = async (event) => {
+    event.preventDefault();
 
-    const { location_id, mac_address } = this.state;
+    const validation = this.validator.validate(this.state);
+    this.setState({ validation });
+    this.submited = true;
 
-    const formData = new FormData();
+    if (validation.isValid) {
+      const { location_id, mac_address } = this.state;
 
-    formData.append("id", this.props.nodeId);
-    formData.append("location_id", location_id);
-    formData.append("mac_address", mac_address);
+      const formData = new FormData();
 
-    await this.nodeService.update(formData)
-      .then(({ data }) => {
-        this.setState(emptyState);
+      formData.append("id", this.props.nodeId);
+      formData.append("location_id", location_id);
+      formData.append("mac_address", mac_address);
 
-        this.props.handleClose();
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+      await this.nodeService.update(formData)
+        .then(() => {
+          this.submited = false;
+
+          this.setState(emptyState);
+
+          this.props.handleClose();
+          this.props.showNotification('Nó atualizado com sucesso', 'success', 'tr');
+        })
+        .catch(() => {
+          this.props.showNotification('Não foi possível atualizar o cadastro', 'danger', 'tr');
+        });
+    }
+
   };
 
   handleInputChange = (event) => {
+    event.preventDefault();
+
     this.setState({ [event.target.name]: event.target.value });
   };
 
@@ -150,6 +183,8 @@ class NodesFormModal extends React.Component {
   render() {
     const { open, modalType, handleClose, classes } = this.props;
     const { location_id, mac_address, locations } = this.state;
+
+    const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
     return (
       <div>
         <Dialog
@@ -171,8 +206,7 @@ class NodesFormModal extends React.Component {
             <CardHeader color="success" style={{ padding: "0" }}>
               <center><h4>{`${modalType} Nó`}</h4></center>
             </CardHeader>
-
-            <PerfectScrollbar>
+            <form autoComplete="off">
               <CardBody>
                 <Grid container justify="center">
                   <GridItem xs={12} sm={12} md={10}>
@@ -184,7 +218,9 @@ class NodesFormModal extends React.Component {
                         inputProps={{
                           name: 'location_id',
                           required: true,
-                          style: { underline: classes.underline },
+                          classes: {
+                            underline: classes.underlineClasses,
+                          }
                         }}
                       >
                         {
@@ -198,24 +234,13 @@ class NodesFormModal extends React.Component {
                     </FormControl>
                   </GridItem>
                   <GridItem xs={12} sm={12} md={10}>
-                    {/* <CustomInput
-                      id="mac_address"
-                      labelText="Endereço MAC"
-                      formControlProps={{
-                        required: true,
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "mac_address",
-                        value: mac_address,
-                        onChange: this.handleInputChange,
-                        type: "text",
-                      }}
-                    /> */}
                     <CustomMaskedInput
                       id="mac_address"
                       labelText="Endereço MAC"
+                      error={validation.mac_address.isInvalid}
+                      helperText={validation.mac_address.message}
                       formControlProps={{
+                        error: validation.mac_address.isInvalid,
                         required: true,
                         fullWidth: true
                       }}
@@ -225,15 +250,7 @@ class NodesFormModal extends React.Component {
                         onChange: this.handleInputChange,
                         type: "text",
                       }}
-                      mask={[
-                        /[0-9A-Fa-f]/, /[0-9A-Fa-f]/, ':',
-                        /[0-9A-Fa-f]/, /[0-9A-Fa-f]/, ':',
-                        /[0-9A-Fa-f]/, /[0-9A-Fa-f]/, ':',
-                        /[0-9A-Fa-f]/, /[0-9A-Fa-f]/, ':',
-                        /[0-9A-Fa-f]/, /[0-9A-Fa-f]/, ':',
-                        /[0-9A-Fa-f]/, /[0-9A-Fa-f]/
-                      ]}
-                  />
+                    />
                   </GridItem>
                 </Grid>
               </CardBody>
@@ -249,7 +266,7 @@ class NodesFormModal extends React.Component {
                   <Save />
                 </Button>
               </CardFooter>
-            </PerfectScrollbar>
+            </form>
           </Card>
         </Dialog>
       </div>

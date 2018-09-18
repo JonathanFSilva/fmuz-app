@@ -6,13 +6,14 @@ import MaskedInput from "react-text-mask";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import Input from "@material-ui/core/Input";
 // @material-ui/icons
 import Clear from "@material-ui/icons/Clear";
 import Check from "@material-ui/icons/Check";
 // core components
-import customInputStyle from "assets/jss/material-dashboard-react/components/customInputStyle";
+import customInputStyle from "../../assets/jss/material-dashboard-react/components/customInputStyle.jsx";
 
 function MacMask(props) {
   const { inputRef, ...other } = props;
@@ -46,6 +47,7 @@ function CustomMaskedInput({ ...props }) {
     inputProps,
     error,
     success,
+    helperText
   } = props;
 
   const labelClasses = classNames({
@@ -89,6 +91,11 @@ function CustomMaskedInput({ ...props }) {
       ) : success ? (
         <Check className={classes.feedback + " " + classes.labelRootSuccess} />
       ) : null}
+      {
+        helperText && helperText.trim().length > 0
+          ? <FormHelperText>{helperText}</FormHelperText>
+          : null
+      }
     </FormControl>
   );
 }
@@ -101,7 +108,8 @@ CustomMaskedInput.propTypes = {
   inputProps: PropTypes.object,
   formControlProps: PropTypes.object,
   error: PropTypes.bool,
-  success: PropTypes.bool
+  success: PropTypes.bool,
+  helperText: PropTypes.string
 };
 
 export default withStyles(customInputStyle)(CustomMaskedInput);

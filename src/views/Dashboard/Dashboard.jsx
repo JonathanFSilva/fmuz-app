@@ -2,31 +2,31 @@ import React from "react";
 import PropTypes from "prop-types";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
-import Icon from "@material-ui/core/Icon";
 import MobileStepper from "@material-ui/core/MobileStepper";
 import Tooltip from "@material-ui/core/Tooltip";
 // @material-ui/icons
-import Accessibility from "@material-ui/icons/Accessibility";
 import Button from "@material-ui/core/Button";
-import DateRange from "@material-ui/icons/DateRange";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import Store from "@material-ui/icons/Store";
 // core components
-import Card from "components/Card/Card.jsx";
-import CardBody from "components/Card/CardBody.jsx";
-import CardFooter from "components/Card/CardFooter.jsx";
-import CardHeader from "components/Card/CardHeader.jsx";
-import CardIcon from "components/Card/CardIcon.jsx";
-import GridItem from "components/Grid/GridItem.jsx";
-import GridContainer from "components/Grid/GridContainer.jsx";
+import Card from "../../components/Card/Card.jsx";
+import CardBody from "../../components/Card/CardBody.jsx";
+import CardFooter from "../../components/Card/CardFooter.jsx";
+import CardHeader from "../../components/Card/CardHeader.jsx";
+import CardIcon from "../../components/Card/CardIcon.jsx";
+import GridItem from "../../components/Grid/GridItem.jsx";
+import GridContainer from "../../components/Grid/GridContainer.jsx";
+// icons
+import humidity from "../../assets/img/icons/humidity.svg";
+import leaf from "../../assets/img/icons/leaf.svg";
+import thermometer from "../../assets/img/icons/thermometer.svg";
 
 import LineChart from "./LineChart";
-import withAuthentication from "hocs/withAuthentication";
-import MeasurementService from "services/measurement";
-import NodeService from "services/nodes";
+import withAuthentication from "../../hocs/withAuthentication";
+import MeasurementService from "../../services/measurement";
+import NodeService from "../../services/nodes";
 
-import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
 
 const Moment = require('moment');
@@ -40,6 +40,7 @@ const initialState = {
   temperatures: [{ meta: '', value: undefined }],
   activeNode: 0,
 }
+
 
 class Dashboard extends React.PureComponent {
   constructor() {
@@ -64,15 +65,6 @@ class Dashboard extends React.PureComponent {
     this.getLastHour();
   };
 
-  // componentDidMount = async (id = 2) => {
-  //   await this.measurementService.getLastHour(id)
-  //     .then(({ data }) => {
-  //       this.setDataChart(data);
-  //     })
-  //     .catch((err) => {
-  //       // console.log(err);
-  //     })
-  // };
   getLastHour = async () => {
     const id = this.state.nodes[this.state.activeNode].id;
 
@@ -90,12 +82,11 @@ class Dashboard extends React.PureComponent {
 
     data.forEach((item) => {
       labels.push(item.created_at);
-      humiditys.push({ meta: Moment(item.created_at).format('HH:mm:ss'), value: item.humidity });
-      temperatures.push({ meta: Moment(item.created_at).format('HH:mm:ss'), value: item.temperature });
+      humiditys.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.humidity });
+      temperatures.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.temperature });
     });
 
     this.setState({ labels, humiditys, temperatures });
-    // this.setState({ labels, humiditys, temperatures }, () => { console.log(this.state) })
   }
 
   handleChangeChart = (index, title, color) => {
@@ -116,7 +107,7 @@ class Dashboard extends React.PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12} sm={6} md={3}>
+          <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="danger" stats icon>
                 <Tooltip title="Ver gráfico de Temperatura">
@@ -125,23 +116,16 @@ class Dashboard extends React.PureComponent {
                     style={{ cursor: "pointer" }}
                     onClick={() => this.handleChangeChart(1, 'Temperatura', 'danger')}
                   >
-                    <Icon>content_copy</Icon>
+                    <img className="icon" src={thermometer} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Temperatura</p>
                 <h3 className={classes.cardTitle}>{temperatures[temperatures.length - 1].value || ''}ºC</h3>
               </CardHeader>
-              <CardFooter>
-                {/* <div className={classes.stats}>
-                  <Danger>
-                    <Warning />
-                  </Danger>
-                  Get more space
-                </div> */}
-              </CardFooter>
+              <CardFooter></CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
+          <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="info" stats icon>
                 <Tooltip title="Ver gráfico de Umidade">
@@ -150,64 +134,31 @@ class Dashboard extends React.PureComponent {
                     style={{ cursor: "pointer" }}
                     onClick={() => this.handleChangeChart(2, 'Umidade', 'info')}
                   >
-                    <Store />
+                    <img className="icon" src={humidity} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Umidade</p>
                 <h3 className={classes.cardTitle}>{humiditys[humiditys.length - 1].value || ''}%</h3>
               </CardHeader>
-              <CardFooter>
-                {/* <div className={classes.stats}>
-                  <DateRange />
-                  Last 24 Hours
-                </div> */}
-              </CardFooter>
+              <CardFooter></CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="warning" stats icon>
-                <Tooltip title="Ver gráfico de Luminosidade">
-                  <CardIcon
-                    color="warning"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => this.handleChangeChart(3, 'Luminosidade', 'warning')}
-                  >
-                    <Icon>info_outline</Icon>
-                  </CardIcon>
-                </Tooltip>
-                <p className={classes.cardCategory}>Luminosidade</p>
-                <h3 className={classes.cardTitle}>{temperatures[temperatures.length - 1].value || ''}ºC</h3>
-              </CardHeader>
-              <CardFooter>
-                {/* <div className={classes.stats}>
-                  <LocalOffer />
-                  Tracked from Github
-                </div> */}
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
+          <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="success" stats icon>
                 <Tooltip title="Ver gráfico de Molhamento Foliar">
                   <CardIcon
                     color="success"
                     style={{ cursor: "pointer" }}
-                    onClick={() => this.handleChangeChart(4, 'Molhamento Foliar', 'success')}
+                    onClick={() => this.handleChangeChart(3, 'Molhamento Foliar', 'success')}
                   >
-                    <Accessibility />
+                    <img className="icon" src={leaf} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Molhamento</p>
                 <h3 className={classes.cardTitle}>{humiditys[humiditys.length - 1].value || ''}%</h3>
               </CardHeader>
-              <CardFooter>
-                {/* <div className={classes.stats}>
-                  <Update />
-                  Just Updated
-                </div> */}
-              </CardFooter>
+              <CardFooter></CardFooter>
             </Card>
           </GridItem>
         </GridContainer>
@@ -228,12 +179,7 @@ class Dashboard extends React.PureComponent {
                     : null
                 }
                 {
-                  index === 3 && !!temperatures
-                    ? <LineChart data={{ labels, series: [temperatures] } || {}} labelY="%" serie="Luminosidade" />
-                    : null
-                }
-                {
-                  index === 4 && !!humiditys
+                  index === 3 && !!humiditys
                     ? <LineChart data={{ labels, series: [humiditys] } || {}} labelY="%" serie="Molhamento Foliar" />
                     : null
                 }
@@ -287,4 +233,3 @@ Dashboard.propTypes = {
 Dashboard = withStyles(dashboardStyle)(Dashboard);
 
 export default withAuthentication(Dashboard);
-

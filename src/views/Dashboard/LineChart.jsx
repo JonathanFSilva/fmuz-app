@@ -11,7 +11,7 @@ require("chartist-plugin-tooltips");
 
 
 const LineChart = ({ ...props }) => {
-  const { data, labelX, labelY, serie } = props;
+  const { data, labelY, serie } = props;
 
   const options = {
     axisY: {
@@ -21,8 +21,9 @@ const LineChart = ({ ...props }) => {
       }
     },
     axisX: {
+      offset: 50,
       labelInterpolationFnc: function (value) {
-        return Moment(value).format('HH:mm:ss');
+        return Moment(value).format('HH:mm');
       }
     },
     lineSmooth: Chartist.Interpolation.cardinal({
@@ -48,16 +49,16 @@ const LineChart = ({ ...props }) => {
     }
   };
 
-  const responsiveOptions = [
-    ['screen and (max-width: 640px)', {
-      seriesBarDistance: 5,
-      axisX: {
-        labelInterpolationFnc: function (value) {
-          return Moment(value).format('HH:mm');
-        }
-      }
-    }]
-  ];
+  // const responsiveOptions = [
+  //   ['screen and (max-width: 640px)', {
+  //     // seriesBarDistance: 5,
+  //     axisX: {
+  //       labelInterpolationFnc: function (value) {
+  //         return Moment(value).format('HH:mm');
+  //       }
+  //     }
+  //   }]
+  // ];
 
   const animation = {
     draw: function (data) {
@@ -95,7 +96,7 @@ const LineChart = ({ ...props }) => {
       data={data}
       type="Line"
       options={options}
-      responsiveOptions={responsiveOptions}
+      // responsiveOptions={responsiveOptions}
       listener={animation}
     />
   );

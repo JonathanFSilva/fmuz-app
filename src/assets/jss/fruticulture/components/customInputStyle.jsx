@@ -3,7 +3,7 @@ import {
   dangerColor,
   successColor,
   defaultFont
-} from "assets/jss/material-dashboard-react.jsx";
+} from "assets/jss/fruticulture.jsx";
 
 const customInputStyle = {
   disabled: {
@@ -17,8 +17,7 @@ const customInputStyle = {
       borderWidth: "1px !important"
     },
     "&:after": {
-      borderColor: successColor
-      // borderColor: primaryColor
+      borderColor: successColor,
     }
   },
   underlineError: {

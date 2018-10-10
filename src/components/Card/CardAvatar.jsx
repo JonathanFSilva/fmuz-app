@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
 // core components
-import cardAvatarStyle from "../../assets/jss/material-dashboard-react/components/cardAvatarStyle.jsx";
+import cardAvatarStyle from "../../assets/jss/fruticulture/components/cardAvatarStyle.jsx";
 
 function CardAvatar({ ...props }) {
   const { classes, children, className, plain, profile, ...rest } = props;

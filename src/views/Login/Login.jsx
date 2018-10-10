@@ -4,11 +4,11 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
 import Grid from "@material-ui/core/Grid";
-import InputAdornment from "@material-ui/core/InputAdornment";
+// import InputAdornment from "@material-ui/core/InputAdornment";
 // @material-ui/icons
 import AddAlert from "@material-ui/icons/AddAlert";
-import Email from "@material-ui/icons/Email";
-import Lock from "@material-ui/icons/Lock";
+// import Email from "@material-ui/icons/Email";
+// import Lock from "@material-ui/icons/Lock";
 import Slide from "@material-ui/core/Slide";
 // core components
 import Button from "../../components/CustomButtons/Button";
@@ -134,7 +134,7 @@ class Login extends React.Component {
           close
         />
 
-        <Grid container alignItems="center" justify="center" className={classes.gridStyle}>
+        <Grid container alignItems="center" justify="center" className={classes.gridStyle} xs={10} sm={10} md={4}>
           <Dialog
             keepMounted
             open={true}
@@ -171,11 +171,11 @@ class Login extends React.Component {
                         }}
                         inputProps={
                           {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Email color="disabled" />
-                              </InputAdornment>
-                            ),
+                            // endAdornment: (
+                            //   <InputAdornment position="end">
+                            //     <Email color="disabled" />
+                            //   </InputAdornment>
+                            // ),
                             autoFocus: true,
                             onChange: this.handleInputChange,
                             type: "text",
@@ -189,18 +189,19 @@ class Login extends React.Component {
                         labelText="Senha"
                         error={validation.password.isInvalid}
                         helperText={validation.password.message}
-                        formControlProps={{ 
+                        formControlProps={{
                           error: validation.password.isInvalid,
                           required: true,
-                          fullWidth: true 
+                          fullWidth: true
                         }}
                         inputProps={
                           {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Lock color="disabled" />
-                              </InputAdornment>
-                            ),
+                            // endAdornment: (
+                            //   <InputAdornment position="end">
+                            //     <Lock color="disabled" />
+                            //   </InputAdornment>
+                            // ),
+                            // eslint-disable-next-line
                             onKeyPress: (event) => { event.key === "Enter" ? this.onFormSubmit(event) : null },
                             onChange: this.handleInputChange,
                             type: "password",

@@ -5,7 +5,7 @@ import {
   successColor,
   warningColor,
   dangerColor
-} from "assets/jss/material-dashboard-react.jsx";
+} from "assets/jss/fruticulture.jsx";
 
 const typographyStyle = {
   defaultFontStyle: {

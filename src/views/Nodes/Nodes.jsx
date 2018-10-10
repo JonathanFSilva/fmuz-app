@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 // react moment
-import Moment from 'react-moment';
+// import Moment from 'react-moment';
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from '@material-ui/core/Dialog';
@@ -31,8 +31,10 @@ import NodesFormModal from "./NodesFormModal.jsx";
 import NodeService from "../../services/nodes";
 import withAdmin from "../../hocs/withAdmin";
 
-import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import dashboardStyle from "../../assets/jss/fruticulture/views/dashboardStyle.jsx";
 
+
+const Moment = require('moment');
 
 class Nodes extends React.Component {
   constructor() {
@@ -73,7 +75,14 @@ class Nodes extends React.Component {
         const nodes = [];
 
         data.forEach((item) => {
-          nodes.push([item.id, item.name, item.mac_address, <Moment format="DD/MM/YYYY - HH:mm">{item.created_at}</Moment>]);
+          nodes.push(
+            {
+              id: item.id,
+              location: item.name,
+              mac_address: item.mac_address,
+              created_at: Moment(item.created_at).format("DD/MM/YYYY HH:mm")
+            }
+          );
         });
 
         this.setState({ nodes });
@@ -140,7 +149,7 @@ class Nodes extends React.Component {
               <CardHeader color="success" icon>
                 <CardIcon color="success">
                   <Button type="button" color="transparent" className={classes.cardIconButton} onClick={this.handleClickOpen}>
-                    <Tooltip title="Adicionar Nó" enterDelay={300}>
+                    <Tooltip title="Adicionar Nó" enterDelay={300} placement="bottom" classes={{ tooltip: classes.tooltip }}>
                       <Add />
                     </Tooltip>
                   </Button>

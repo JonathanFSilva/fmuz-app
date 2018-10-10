@@ -4,7 +4,7 @@ const url = 'measurements';
 
 class MeasurementService {
 
-  getLastHour = (id) => { return api.get(`${url}/${id}`) };
+  getMeasurementList = (id, qtde) => { return api.get(`${url}/${id}/${qtde}`) };
 
 }
 

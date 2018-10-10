@@ -3,7 +3,7 @@ import {
   dangerColor,
   primaryColor, 
   successColor
-} from "assets/jss/material-dashboard-react.jsx";
+} from "assets/jss/fruticulture.jsx";
 
 const checkboxAdnRadioStyle = {
   checked: {

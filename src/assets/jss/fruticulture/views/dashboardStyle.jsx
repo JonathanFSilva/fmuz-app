@@ -1,6 +1,8 @@
-import { successColor } from "assets/jss/material-dashboard-react.jsx";
+import { successColor } from "assets/jss/fruticulture.jsx";
+import tooltipStyle from "assets/jss/fruticulture/tooltipStyle.jsx";
 
 const dashboardStyle = {
+  ...tooltipStyle,
   successText: {
     color: successColor
   },

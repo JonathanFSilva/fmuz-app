@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  // baseURL: 'http://jonathanfsilva.ddns.net/api/',
+  // baseURL: 'http://18.231.25.86/api/',
   baseURL: 'http://localhost:3333/api/',
 });
 

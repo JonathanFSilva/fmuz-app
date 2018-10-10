@@ -24,7 +24,13 @@ import LocationService from "../../services/locations";
 
 const initialState = {
   name: '',
-  description: ''
+  description: '',
+  max_humidity: '',
+  min_humidity: '',
+  max_temperature: '',
+  min_temperature: '',
+  max_leafWetness: '',
+  min_leafWetness: ''
 };
 
 
@@ -59,7 +65,18 @@ class LocationsFormModal extends React.Component {
       if (this.state.name === '' && this.state.description === '') {
         await this.locationService.getOne(this.props.locationId)
           .then(({ data }) => {
-            this.setState({ name: data.name, description: data.description });
+            this.setState(
+              {
+                name: data.name,
+                description: data.description,
+                max_humidity: data.max_humidity,
+                min_humidity: data.min_humidity,
+                max_temperature: data.max_temperature,
+                min_temperature: data.min_temperature,
+                max_leafWetness: data.max_leafWetness,
+                min_leafWetness: data.min_leafWetness
+              }
+            );
           });
       }
     }
@@ -73,12 +90,27 @@ class LocationsFormModal extends React.Component {
     this.submited = true;
 
     if (validation.isValid) {
-      const { name, description } = this.state;
+      const {
+        name,
+        description,
+        max_temperature,
+        min_temperature,
+        max_humidity,
+        min_humidity,
+        max_leafWetness,
+        min_leafWetness
+      } = this.state;
 
       const formData = new FormData();
 
       formData.append("name", name);
       formData.append("description", description);
+      formData.append("max_humidity", max_humidity);
+      formData.append("min_humidity", min_humidity);
+      formData.append("max_temperature", max_temperature);
+      formData.append("min_temperature", min_temperature);
+      formData.append("max_leafWetness", max_leafWetness);
+      formData.append("min_leafWetness", min_leafWetness);
 
       await this.locationService.create(formData)
         .then(() => {
@@ -105,13 +137,28 @@ class LocationsFormModal extends React.Component {
     this.submited = true;
 
     if (validation.isValid) {
-      const { name, description } = this.state;
+      const {
+        name,
+        description,
+        max_temperature,
+        min_temperature,
+        max_humidity,
+        min_humidity,
+        max_leafWetness,
+        min_leafWetness
+      } = this.state;
 
       const formData = new FormData();
 
       formData.append("id", this.props.locationId);
       formData.append("name", name);
       formData.append("description", description);
+      formData.append("max_humidity", max_humidity);
+      formData.append("min_humidity", min_humidity);
+      formData.append("max_temperature", max_temperature);
+      formData.append("min_temperature", min_temperature);
+      formData.append("max_leafWetness", max_leafWetness);
+      formData.append("min_leafWetness", min_leafWetness);
 
       await this.locationService.update(formData)
         .then(() => {
@@ -132,18 +179,28 @@ class LocationsFormModal extends React.Component {
   handleInputChange = (event) => {
     event.preventDefault();
 
-    this.setState({ [event.target.id]: event.target.value });
+    this.setState({ [event.target.id]: event.target.value }, () => { console.log(this.state) });
   };
 
   handleCancel = () => {
-    this.setState(initialState);
+    this.setState({ ...initialState, validation: this.validator.valid() });
+    this.submited = false;
 
     this.props.handleClose();
   };
 
   render() {
     const { open, modalType, handleClose } = this.props;
-    const { name, description } = this.state;
+    const {
+      name,
+      description,
+      max_temperature,
+      min_temperature,
+      max_humidity,
+      min_humidity,
+      max_leafWetness,
+      min_leafWetness
+    } = this.state;
 
     const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
 
@@ -165,13 +222,13 @@ class LocationsFormModal extends React.Component {
           }}
         >
           <Card>
-            <CardHeader color="success" style={{ padding: "0" }}>
+            <CardHeader color="success">
               <center><h4>{`${modalType} Local`}</h4></center>
             </CardHeader>
             <form autoComplete="off">
               <CardBody>
                 <Grid container justify="center">
-                  <GridItem xs={12} sm={12} md={10}>
+                  <GridItem xs={12} sm={12} md={12}>
                     <CustomInput
                       id="name"
                       labelText="Nome do Local"
@@ -190,7 +247,9 @@ class LocationsFormModal extends React.Component {
                       }}
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={10}>
+                </Grid>
+                <Grid container justify="center">
+                  <GridItem xs={12} sm={12} md={12}>
                     <CustomInput
                       id="description"
                       labelText="Descrição"
@@ -203,11 +262,99 @@ class LocationsFormModal extends React.Component {
                       }}
                       inputProps={{
                         multiline: true,
-                        rows: 2,
-                        rowsMax: 10,
+                        // rows: 1,
+                        rowsMax: 2,
                         value: description,
                         onChange: this.handleInputChange,
                         type: "text",
+                      }}
+                    />
+                  </GridItem>
+                </Grid>
+                <Grid container justify="center">
+                  <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                      id="max_temperature"
+                      labelText="Máx. Temp."
+                      formControlProps={{
+                        fullWidth: true
+                      }}
+                      inputProps={{
+                        value: max_temperature,
+                        onChange: this.handleInputChange,
+                        type: "number",
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                      id="max_humidity"
+                      labelText="Máx. Umid."
+                      formControlProps={{
+                        fullWidth: true
+                      }}
+                      inputProps={{
+                        value: max_humidity,
+                        onChange: this.handleInputChange,
+                        type: "number",
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                      id="max_leafWetness"
+                      labelText="Máx. Mol."
+                      formControlProps={{
+                        fullWidth: true
+                      }}
+                      inputProps={{
+                        value: max_leafWetness,
+                        onChange: this.handleInputChange,
+                        type: "number",
+                      }}
+                    />
+                  </GridItem>
+                </Grid>
+                <Grid container justify="center">
+                  <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                      id="min_temperature"
+                      labelText="Mín. Temp."
+                      formControlProps={{
+                        fullWidth: true
+                      }}
+                      inputProps={{
+                        value: min_temperature,
+                        onChange: this.handleInputChange,
+                        type: "number",
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                      id="min_humidity"
+                      labelText="Mín. Umid."
+                      formControlProps={{
+                        fullWidth: true
+                      }}
+                      inputProps={{
+                        value: min_humidity,
+                        onChange: this.handleInputChange,
+                        type: "number",
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                      id="min_leafWetness"
+                      labelText="Mín. Mol."
+                      formControlProps={{
+                        fullWidth: true
+                      }}
+                      inputProps={{
+                        value: min_leafWetness,
+                        onChange: this.handleInputChange,
+                        type: "number",
                       }}
                     />
                   </GridItem>

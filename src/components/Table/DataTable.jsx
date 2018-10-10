@@ -13,21 +13,53 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Edit from "@material-ui/icons/Edit";
 import Delete from "@material-ui/icons/Delete";
 
-import tableStyle from "../../assets/jss/material-dashboard-react/components/tableStyle.jsx";
+import tableStyle from "../../assets/jss/fruticulture/components/tableStyle.jsx";
 
 import DataTableHead from "./DataTableHead.jsx";
 
 
-function getSorting(order, orderBy) {
-  return order === 'desc' ? (a, b) => b[orderBy] - a[orderBy] : (a, b) => a[orderBy] - b[orderBy];
+function desc(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
 }
+
+function stableSort(array, cmp) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+
+  stabilizedThis.sort((a, b) => {
+    const order = cmp(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map(el => el[0]);
+}
+
+function getSorting(order, orderBy) {
+  return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
+}
+
+function getKeys(tableHead) {
+  const keys = [];
+  
+  tableHead.map((el) => {
+    keys.push(el.key);
+  });
+
+  return keys;
+}
+
 
 class DataTable extends React.Component {
   state = {
     order: 'desc',
     orderBy: '',
     page: 0,
-    rowsPerPage: 5,
+    rowsPerPage: 25,
   };
 
   handleRequestSort = (event, property) => {
@@ -39,7 +71,6 @@ class DataTable extends React.Component {
     }
 
     this.setState({ order, orderBy });
-    // console.log(this.state);
   };
 
   handleChangePage = (event, page) => {
@@ -49,7 +80,7 @@ class DataTable extends React.Component {
   handleChangeRowsPerPage = event => {
     this.setState({ rowsPerPage: event.target.value });
   };
-  
+
   render() {
     const { classes, action, tableHead, tableData, tableHeaderColor, openModal, deleteItem } = this.props;
     const { order, orderBy, rowsPerPage, page } = this.state;
@@ -61,43 +92,58 @@ class DataTable extends React.Component {
             action={action}
             order={order}
             orderBy={orderBy}
+            onRequestSort={this.handleRequestSort}
             tableHead={tableHead}
             tableHeaderColor={tableHeaderColor}
-            onRequestSort={this.handleRequestSort}
           />
           <TableBody>
-            {tableData
-              .sort(getSorting(order, orderBy))
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((prop, key) => {
-                return (
-                  <TableRow key={key}>
-                    {prop.map((prop, key) => {
-                      return (
-                        <TableCell className={classes.tableCell} key={key}>
-                          {prop}
-                        </TableCell>
-                      );
-                    })}
-                    {
-                      action
-                        ? <TableCell className={classes.tableCell} numeric>
-                          <Tooltip title="Editar">
-                            <IconButton className={classes.action} onClick={() => openModal(prop[0])}>
-                              <Edit className={classes.actionIcon} />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Excluir">
-                            <IconButton className={classes.action} onClick={() => deleteItem(prop[0])}>
-                              <Delete className={classes.actionIcon} />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                        : null
-                    }
-                  </TableRow>
-                );
-              })
+            {
+              tableData.length > 0
+                ? stableSort(tableData, getSorting(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((prop, key) => {
+                    return (
+                      <TableRow key={key}>
+                        {/* {prop.map((prop, key) => {
+                          return (
+                            <TableCell className={classes.tableCell} key={key}>
+                              {prop}
+                            </TableCell>
+                          );
+                        })} */}
+                        {
+                          getKeys(tableHead).map((el, k) => {
+                            return (
+                              <TableCell className={classes.tableCell} key={key + k}>
+                                {prop[el]}
+                              </TableCell>
+                            );
+                          })
+                        }
+                        {
+                          action
+                            ? <TableCell className={classes.tableCell} numeric>
+                              <Tooltip title="Editar" placement="top" classes={{ tooltip: classes.tooltip }}>
+                                <IconButton className={classes.action} onClick={() => openModal(prop.id)}>
+                                  <Edit className={classes.actionIcon} />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Excluir" placement="top" classes={{ tooltip: classes.tooltip }}>
+                                <IconButton className={classes.action} onClick={() => deleteItem(prop.id)}>
+                                  <Delete className={classes.actionIcon} />
+                                </IconButton>
+                              </Tooltip>
+                            </TableCell>
+                            : null
+                        }
+                      </TableRow>
+                    );
+                  })
+                : <TableRow>
+                  <TableCell style={{ textAlign: "center" }} colSpan={tableHead.length}>
+                    {"Nenhum dado encontrado!"}
+                  </TableCell>
+                </TableRow>
             }
           </TableBody>
         </Table>

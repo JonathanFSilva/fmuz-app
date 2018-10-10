@@ -1,8 +1,8 @@
 import {
-  primaryColor,
-  primaryBoxShadow,
+  successColor,
+  successBoxShadow,
   defaultFont
-} from "assets/jss/material-dashboard-react.jsx";
+} from "assets/jss/fruticulture.jsx";
 
 const dropdownStyle = theme => ({
   buttonLink: {
@@ -109,10 +109,14 @@ const dropdownStyle = theme => ({
     whiteSpace: "nowrap",
     height: "unset",
     "&:hover": {
-      backgroundColor: primaryColor,
+      backgroundColor: successColor,
       color: "#FFFFFF",
-      ...primaryBoxShadow
+      ...successBoxShadow
     }
+  },
+  dropdownItemSelected: {
+    backgroundColor: `${successColor} !important`,
+    color: "#FFFFFF"
   }
 });
 

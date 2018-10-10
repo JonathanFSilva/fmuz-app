@@ -4,12 +4,7 @@ import FormData from "form-data";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
-import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
-// import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
 import Slide from "@material-ui/core/Slide";
 // @material-ui/icons
 import Save from "@material-ui/icons/Save";
@@ -20,11 +15,11 @@ import Card from "../../components/Card/Card";
 import CardBody from "../../components/Card/CardBody";
 import CardHeader from "../../components/Card/CardHeader";
 import CardFooter from "../../components/Card/CardFooter";
-// import CustomInput from "../../components/CustomInput/CustomInput";
 import CustomMaskedInput from "../../components/CustomMaskedInput/CustomMaskedInput";
 import GridItem from "../../components/Grid/GridItem";
+import SelectInput from "../../components/SelectInput/SelectInput";
 
-import customInputStyle from "../../assets/jss/material-dashboard-react/components/customInputStyle";
+import customInputStyle from "../../assets/jss/fruticulture/components/customInputStyle";
 
 import FormValidator from "../../validations/FormValidator";
 
@@ -68,7 +63,7 @@ class NodesFormModal extends React.Component {
       {
         field: 'mac_address',
         method: 'matches',
-        args: [/^[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}\:[0-9A-Fa-f]{2}$/], 
+        args: [/^[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}$/],
         validWhen: true,
         message: 'Valor informado não é um endereço mac válido'
       },
@@ -175,13 +170,14 @@ class NodesFormModal extends React.Component {
   };
 
   handleCancel = () => {
-    this.setState(emptyState);
+    this.setState({ ...emptyState, validation: this.validator.valid() });
+    this.submited = false;
 
     this.props.handleClose();
   }
 
   render() {
-    const { open, modalType, handleClose, classes } = this.props;
+    const { open, modalType, handleClose } = this.props;
     const { location_id, mac_address, locations } = this.state;
 
     const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
@@ -203,35 +199,31 @@ class NodesFormModal extends React.Component {
           }}
         >
           <Card>
-            <CardHeader color="success" style={{ padding: "0" }}>
+            <CardHeader color="success">
               <center><h4>{`${modalType} Nó`}</h4></center>
             </CardHeader>
             <form autoComplete="off">
               <CardBody>
                 <Grid container justify="center">
                   <GridItem xs={12} sm={12} md={10}>
-                    <FormControl className={classes.formControl} required fullWidth>
-                      <InputLabel htmlFor="location_id" className={classes.labelRoot}>Localização</InputLabel>
-                      <Select
-                        value={location_id}
-                        onChange={this.handleInputChange}
-                        inputProps={{
-                          name: 'location_id',
-                          required: true,
-                          classes: {
-                            underline: classes.underlineClasses,
-                          }
-                        }}
-                      >
-                        {
-                          locations.map((item, key) => {
-                            return (
-                              <MenuItem value={item[0]} key={key}>{item[1]}</MenuItem>
-                            );
-                          })
-                        }
-                      </Select>
-                    </FormControl>
+                    <SelectInput
+                      id="location_id"
+                      labelText="Localização"
+                      error={validation.location_id.isInvalid}
+                      helperText={validation.location_id.message}
+                      formControlProps={{
+                        error: validation.location_id.isInvalid,
+                        required: true,
+                        fullWidth: true,
+                      }}
+                      inputProps={{
+                        name: "location_id",
+                        value: location_id,
+                        onChange: this.handleInputChange,
+                        type: "text"
+                      }}
+                      options={locations}
+                    />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={10}>
                     <CustomMaskedInput

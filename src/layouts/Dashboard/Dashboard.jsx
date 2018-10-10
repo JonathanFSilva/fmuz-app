@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withRouter, Switch, Route, Redirect } from "react-router-dom";
 // creates a beautiful scrollbar
-import "react-perfect-scrollbar/dist/css/styles.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
+// import "react-perfect-scrollbar/dist/css/styles.css";
+// import PerfectScrollbar from "react-perfect-scrollbar";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 // core components
@@ -13,7 +13,7 @@ import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 
 import dashboardRoutes from "../../routes/dashboard.jsx";
 
-import dashboardStyle from "../../assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
+import dashboardStyle from "../../assets/jss/fruticulture/layouts/dashboardStyle.jsx";
 import backgroundImage from "../../assets/img/sidebar.jpg";
 import logoIF from "../../assets/img/IF.png";
 
@@ -49,12 +49,12 @@ class App extends React.Component {
       this.setState({ mobileOpen: false });
     }
   }
-  componentDidMount() {
-    if (navigator.platform.indexOf("Win") > -1) {
-      const ps = new PerfectScrollbar(this.refs.mainPanel);
-    }
-    window.addEventListener("resize", this.resizeFunction);
-  }
+  // componentDidMount() {
+  //   if (navigator.platform.indexOf("Win") > -1) {
+  //     const ps = new PerfectScrollbar(this.refs.mainPanel);
+  //   }
+  //   window.addEventListener("resize", this.resizeFunction);
+  // }
   componentDidUpdate(e) {
     if (e.history.location.pathname !== e.location.pathname) {
       this.refs.mainPanel.scrollTop = 0;

@@ -15,7 +15,7 @@ import Menu from "@material-ui/icons/Menu";
 // core components
 import Button from "components/CustomButtons/Button";
 
-import headerStyle from "../../assets/jss/material-dashboard-react/components/headerStyle.jsx";
+import headerStyle from "../../assets/jss/fruticulture/components/headerStyle.jsx";
 
 
 function Header({ ...props }) {

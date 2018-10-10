@@ -1,6 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
+import Datetime from "react-datetime";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import FormControl from "@material-ui/core/FormControl";
@@ -11,10 +12,28 @@ import Input from "@material-ui/core/Input";
 import Clear from "@material-ui/icons/Clear";
 import Check from "@material-ui/icons/Check";
 // core components
+
 import customInputStyle from "../../assets/jss/fruticulture/components/customInputStyle.jsx";
 
 
-function CustomInput({ ...props }) {
+function CustomDatetime(props) {
+  const { inputRef, ...other } = props;
+  return (
+    <Datetime
+      {...other}
+      ref={inputRef}
+      dateFormat={"DD/MM/YYYY"}
+      timeFormat={"HH:mm"}
+      closeOnSelect={false}
+    />
+  );
+}
+
+CustomDatetime.propTypes = {
+  inputRef: PropTypes.func.isRequired,
+};
+
+function DatePicker({ ...props }) {
   const {
     classes,
     formControlProps,
@@ -61,6 +80,7 @@ function CustomInput({ ...props }) {
         }}
         id={id}
         {...inputProps}
+        inputComponent={CustomDatetime}
       />
       {error ? (
         <Clear className={classes.feedback + " " + classes.labelRootError} />
@@ -69,14 +89,14 @@ function CustomInput({ ...props }) {
       ) : null}
       {
         helperText && helperText.trim().length > 0
-        ? <FormHelperText>{helperText}</FormHelperText>
-        : null
+          ? <FormHelperText>{helperText}</FormHelperText>
+          : null
       }
     </FormControl>
   );
 }
 
-CustomInput.propTypes = {
+DatePicker.propTypes = {
   classes: PropTypes.object.isRequired,
   labelText: PropTypes.node,
   labelProps: PropTypes.object,
@@ -88,4 +108,4 @@ CustomInput.propTypes = {
   helperText: PropTypes.string
 };
 
-export default withStyles(customInputStyle)(CustomInput);
+export default withStyles(customInputStyle)(DatePicker);

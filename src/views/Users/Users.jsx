@@ -29,7 +29,7 @@ import UsersFormModal from "./UsersFormModal.jsx";
 import UserService from "../../services/user.js";
 import withAdmin from "../../hocs/withAdmin";
 
-import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import dashboardStyle from "../../assets/jss/fruticulture/views/dashboardStyle.jsx";
 
 
 class Users extends React.PureComponent {
@@ -71,15 +71,17 @@ class Users extends React.PureComponent {
         const users = [];
 
         data.forEach((item) => {
-          users.push([
-            item.id,
-            item.name,
-            item.email,
-            item.username,
-            item.is_admin === 1
-              ? <Check style={{ color: "#4caf50" }} />
-              : <Close style={{ color: "#f44336" }} />
-          ]);
+          users.push(
+            {
+              id: item.id,
+              name: item.name,
+              email: item.email,
+              username: item.username,
+              is_admin: item.is_admin === 1
+                ? <Check style={{ color: "#4caf50" }} />
+                : <Close style={{ color: "#f44336" }} />
+            }
+          );
         });
 
         this.setState({ users });
@@ -146,7 +148,7 @@ class Users extends React.PureComponent {
               <CardHeader color="success" icon>
                 <CardIcon color="success">
                   <Button type="button" color="transparent" className={classes.cardIconButton} onClick={this.handleClickOpen}>
-                    <Tooltip title="Adicionar Usuário" enterDelay={300}>
+                    <Tooltip title="Adicionar Usuário" enterDelay={300} placement="bottom" classes={{ tooltip: classes.tooltip }}>
                       <Add />
                     </Tooltip>
                   </Button>

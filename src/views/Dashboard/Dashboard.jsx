@@ -26,7 +26,7 @@ import withAuthentication from "../../hocs/withAuthentication";
 import MeasurementService from "../../services/measurement";
 import NodeService from "../../services/nodes";
 
-import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
+import dashboardStyle from "../../assets/jss/fruticulture/views/dashboardStyle.jsx";
 
 
 const Moment = require('moment');
@@ -62,13 +62,13 @@ class Dashboard extends React.PureComponent {
         this.setState({ nodes });
       })
 
-    this.getLastHour();
+    this.getMeasurementList();
   };
 
-  getLastHour = async () => {
+  getMeasurementList = async (qtde = 30) => {
     const id = this.state.nodes[this.state.activeNode].id;
 
-    await this.measurementService.getLastHour(id)
+    await this.measurementService.getMeasurementList(id, qtde)
       .then(({ data }) => {
         this.setDataChart(data);
       })
@@ -94,11 +94,11 @@ class Dashboard extends React.PureComponent {
   };
 
   handleNext = () => {
-    this.setState({ activeNode: this.state.activeNode + 1 }, () => { this.getLastHour() });
+    this.setState({ activeNode: this.state.activeNode + 1 }, () => { this.getMeasurementList() });
   };
 
   handleBack = () => {
-    this.setState({ activeNode: this.state.activeNode - 1 }, () => { this.getLastHour() });
+    this.setState({ activeNode: this.state.activeNode - 1 }, () => { this.getMeasurementList() });
   };
 
   render() {
@@ -110,17 +110,17 @@ class Dashboard extends React.PureComponent {
           <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="danger" stats icon>
-                <Tooltip title="Ver gráfico de Temperatura">
+                <Tooltip title="Ver gráfico de Temperatura" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                   <CardIcon
                     color="danger"
                     style={{ cursor: "pointer" }}
                     onClick={() => this.handleChangeChart(1, 'Temperatura', 'danger')}
                   >
-                    <img className="icon" src={thermometer} />
+                    <img alt="thermometer-icon" className="icon" src={thermometer} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Temperatura</p>
-                <h3 className={classes.cardTitle}>{temperatures[temperatures.length - 1].value || ''}ºC</h3>
+                <h3 className={classes.cardTitle}>{!!temperatures ? temperatures[temperatures.length - 1].value : ''}ºC</h3>
               </CardHeader>
               <CardFooter></CardFooter>
             </Card>
@@ -128,17 +128,17 @@ class Dashboard extends React.PureComponent {
           <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="info" stats icon>
-                <Tooltip title="Ver gráfico de Umidade">
+                <Tooltip title="Ver gráfico de Umidade" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                   <CardIcon
                     color="info"
                     style={{ cursor: "pointer" }}
                     onClick={() => this.handleChangeChart(2, 'Umidade', 'info')}
                   >
-                    <img className="icon" src={humidity} />
+                    <img alt="humidity-icon" className="icon" src={humidity} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Umidade</p>
-                <h3 className={classes.cardTitle}>{humiditys[humiditys.length - 1].value || ''}%</h3>
+                <h3 className={classes.cardTitle}>{!!humiditys ? humiditys[humiditys.length - 1].value : ''}%</h3>
               </CardHeader>
               <CardFooter></CardFooter>
             </Card>
@@ -146,17 +146,17 @@ class Dashboard extends React.PureComponent {
           <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="success" stats icon>
-                <Tooltip title="Ver gráfico de Molhamento Foliar">
+                <Tooltip title="Ver gráfico de Molhamento Foliar" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                   <CardIcon
                     color="success"
                     style={{ cursor: "pointer" }}
                     onClick={() => this.handleChangeChart(3, 'Molhamento Foliar', 'success')}
                   >
-                    <img className="icon" src={leaf} />
+                    <img alt="leaf-wetness-icon" className="icon" src={leaf} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Molhamento</p>
-                <h3 className={classes.cardTitle}>{humiditys[humiditys.length - 1].value || ''}%</h3>
+                <h3 className={classes.cardTitle}>{!!humiditys ? humiditys[humiditys.length - 1].value : ''}%</h3>
               </CardHeader>
               <CardFooter></CardFooter>
             </Card>
@@ -196,14 +196,14 @@ class Dashboard extends React.PureComponent {
                     position="static"
                     activeStep={activeNode}
                     nextButton={
-                      <Tooltip title="Próximo nó">
+                      <Tooltip title="Próximo nó" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                         <Button size="small" onClick={this.handleNext} disabled={activeNode === nodes.length - 1}>
                           <KeyboardArrowRight />
                         </Button>
                       </Tooltip>
                     }
                     backButton={
-                      <Tooltip title="Nó Anterior">
+                      <Tooltip title="Nó Anterior" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                         <Button size="small" onClick={this.handleBack} disabled={activeNode === 0}>
                           <KeyboardArrowLeft />
                         </Button>

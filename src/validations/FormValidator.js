@@ -12,16 +12,30 @@ class FormValidator {
     this.validations.forEach((rule) => {
 
       if (!validation[rule.field].isInvalid) {
-        const field = state[rule.field].toString();
-        const args = rule.args || [];
-        const method = typeof rule.method === 'string'
-          ? validator[rule.method]
-          : rule.method;
+        // const field = state[rule.field].toString();
+        // const args = rule.args || [];
+        // const method = typeof rule.method === 'string'
+        //   ? validator[rule.method]
+        //   : rule.method;
 
+        if (typeof rule.method === 'string') {
+          const field = state[rule.field].toString();
+          const args = rule.args || [];
+          const method = validator[rule.method];
 
-        if (method(field, ...args, state) !== rule.validWhen) {
-          validation[rule.field] = { isInvalid: true, message: rule.message };
-          validation.isValid = false;
+          if (method(field, ...args, state) !== rule.validWhen) {
+            validation[rule.field] = { isInvalid: true, message: rule.message };
+            validation.isValid = false;
+          }
+        } else {
+          const field = state[rule.field];
+          const args = rule.args || [];
+          const method = rule.method;
+
+          if (method(field, ...args, state) !== rule.validWhen) {
+            validation[rule.field] = { isInvalid: true, message: rule.message };
+            validation.isValid = false;
+          }
         }
       }
     });

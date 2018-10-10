@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 // react moment
-import Moment from "react-moment";
+// import Moment from "react-moment";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
@@ -31,7 +31,10 @@ import LocationsFormModal from "./LocationsFormModal.jsx";
 import LocationService from "../../services/locations";
 import withAdmin from "../../hocs/withAdmin";
 
-import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle";
+import dashboardStyle from "../../assets/jss/fruticulture/views/dashboardStyle";
+
+
+const Moment = require('moment');
 
 
 class Locations extends React.Component {
@@ -73,7 +76,14 @@ class Locations extends React.Component {
         const locations = [];
 
         data.forEach((item) => {
-          locations.push([item.id, item.name, item.description, <Moment format="DD/MM/YYYY - HH:mm">{item.created_at}</Moment>]);
+          locations.push(
+            {
+              id: item.id,
+              name: item.name,
+              description: item.description,
+              created_at: Moment(item.created_at).format("DD/MM/YYYY HH:mm")
+            }
+          );
         });
 
         this.setState({ locations });
@@ -140,7 +150,7 @@ class Locations extends React.Component {
               <CardHeader color="success" icon>
                 <CardIcon color="success">
                   <Button type="button" color="transparent" className={classes.cardIconButton} onClick={this.handleClickOpen}>
-                    <Tooltip title="Adicionar Local" enterDelay={300}>
+                    <Tooltip title="Adicionar Local" enterDelay={300} placement="bottom" classes={{ tooltip: classes.tooltip }}>
                       <Add />
                     </Tooltip>
                   </Button>

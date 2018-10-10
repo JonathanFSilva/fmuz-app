@@ -1,4 +1,4 @@
-import { boxShadow } from "assets/jss/material-dashboard-react.jsx";
+import { boxShadow } from "assets/jss/fruticulture.jsx";
 
 const iconsStyle = {
   iframe: {

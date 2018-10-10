@@ -15,7 +15,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Icon from "@material-ui/core/Icon";
 
-import sidebarStyle from "../../assets/jss/material-dashboard-react/components/sidebarStyle.jsx";
+import sidebarStyle from "../../assets/jss/fruticulture/components/sidebarStyle.jsx";
 import userImage from "../../assets/img/faces/user.jpeg";
 import UserContent from "./UserContent";
 

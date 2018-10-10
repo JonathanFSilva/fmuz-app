@@ -30,7 +30,7 @@ import FormValidator from "../../validations/FormValidator";
 
 import UserService from "../../services/user";
 
-import checkboxAdnRadioStyle from "assets/jss/material-dashboard-react/checkboxAdnRadioStyle.jsx";
+import checkboxAdnRadioStyle from "assets/jss/fruticulture/checkboxAdnRadioStyle.jsx";
 
 
 const initialState = {
@@ -114,8 +114,8 @@ class UsersFormModal extends React.PureComponent {
               name: data.name,
               email: data.email,
               username: data.username,
-              password: '',
-              password_confirmation: '',
+              password: data.password,
+              password_confirmation: data.password,
               thumbnail: data.url,
               is_admin: data.is_admin,
             });
@@ -141,7 +141,8 @@ class UsersFormModal extends React.PureComponent {
   };
 
   handleCancel = () => {
-    this.setState(initialState);
+    this.setState({ ...initialState, validation: this.validator.valid() });
+    this.submited = false;
 
     this.props.handleClose();
   }
@@ -225,7 +226,7 @@ class UsersFormModal extends React.PureComponent {
           this.props.showNotification('Usuário atualizado com sucesso', 'success', 'tr');
         })
         .catch(() => {
-          this.props.showNotification('Não foi possível atualizar o cadastro', 'danger', 'tr');          
+          this.props.showNotification('Não foi possível atualizar o cadastro', 'danger', 'tr');
         })
     }
 
@@ -255,7 +256,7 @@ class UsersFormModal extends React.PureComponent {
           }}
         >
           <Card>
-            <CardHeader color="success" style={{ padding: "0", zIndex: "1500" }}>
+            <CardHeader color="success">
               <center><h4>{`${modalType} Usuário`}</h4></center>
             </CardHeader>
             <form autoComplete="off">
@@ -340,44 +341,54 @@ class UsersFormModal extends React.PureComponent {
                       }}
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={5}>
-                    <CustomInput
-                      id="password"
-                      labelText="Senha"
-                      error={validation.password.isInvalid}
-                      helperText={validation.password.message}
-                      formControlProps={{
-                        error: validation.password.isInvalid,
-                        required: true,
-                        fullWidth: true,
-                        style: { marginTop: "0px" }
-                      }}
-                      inputProps={{
-                        value: password,
-                        onChange: this.handleInputChange,
-                        type: "password",
-                      }}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={5}>
-                    <CustomInput
-                      id="password_confirmation"
-                      labelText="Confirme a senha"
-                      error={validation.password_confirmation.isInvalid}
-                      helperText={validation.password_confirmation.message}
-                      formControlProps={{
-                        error: validation.password_confirmation.isInvalid,
-                        required: true,
-                        fullWidth: true,
-                        style: { marginTop: "0px" }
-                      }}
-                      inputProps={{
-                        value: password_confirmation,
-                        onChange: this.handleInputChange,
-                        type: "password",
-                      }}
-                    />
-                  </GridItem>
+                  {
+                    modalType === 'Cadastrar'
+                      ? <GridItem xs={12} sm={12} md={5}>
+                        <CustomInput
+                          id="password"
+                          labelText="Senha"
+                          error={validation.password.isInvalid}
+                          helperText={validation.password.message}
+                          formControlProps={{
+                            error: validation.password.isInvalid,
+                            required: true,
+                            fullWidth: true,
+                            style: { marginTop: "0px" }
+                          }}
+                          inputProps={{
+                            value: password,
+                            onChange: this.handleInputChange,
+                            type: "password",
+                            hidden: true
+                          }}
+                        />
+                      </GridItem>
+                      : null
+                  }
+                  {
+                    modalType === 'Cadastrar'
+                      ?
+                      <GridItem xs={12} sm={12} md={5}>
+                        <CustomInput
+                          id="password_confirmation"
+                          labelText="Confirme a senha"
+                          error={validation.password_confirmation.isInvalid}
+                          helperText={validation.password_confirmation.message}
+                          formControlProps={{
+                            error: validation.password_confirmation.isInvalid,
+                            required: true,
+                            fullWidth: true,
+                            style: { marginTop: "0px" }
+                          }}
+                          inputProps={{
+                            value: password_confirmation,
+                            onChange: this.handleInputChange,
+                            type: "password",
+                          }}
+                        />
+                      </GridItem>
+                      : null
+                  }
                   <GridItem xs={12} sm={12} md={10}>
                     <FormControlLabel
                       control={

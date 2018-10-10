@@ -13,7 +13,7 @@ import Input from "@material-ui/core/Input";
 import Clear from "@material-ui/icons/Clear";
 import Check from "@material-ui/icons/Check";
 // core components
-import customInputStyle from "../../assets/jss/material-dashboard-react/components/customInputStyle.jsx";
+import customInputStyle from "../../assets/jss/fruticulture/components/customInputStyle.jsx";
 
 function MacMask(props) {
   const { inputRef, ...other } = props;

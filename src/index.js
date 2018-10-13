@@ -8,7 +8,6 @@ import "./assets/css/datetime.css";
 
 import indexRoutes from "./routes/index.jsx";
 
-console.log(process);
 
 const hist = createBrowserHistory();
 ReactDOM.render(

@@ -141,7 +141,7 @@ const sidebarStyle = theme => ({
     display: "block",
     textDecoration: "none",
     "&:hover,&:focus,&:visited,&": {
-      color: "#FFFFFF"
+      color: "#FFFFFF",
     }
   },
   itemLink: {
@@ -153,6 +153,9 @@ const sidebarStyle = theme => ({
     display: "block",
     padding: "10px 15px",
     backgroundColor: "transparent",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.2)"
+    },
     ...defaultFont
   },
   itemIcon: {
@@ -223,6 +226,9 @@ const sidebarStyle = theme => ({
       boxShadow:
         "0 12px 20px -10px rgba(244,67,54,.28), 0 4px 20px 0 rgba(0,0,0,.12), 0 7px 8px -5px rgba(244,67,54,.2)"
     }
+  },
+  white: {
+    backgroundColor: "rgba(255,255,255,0.2)",
   },
   sidebarWrapper: {
     position: "relative",

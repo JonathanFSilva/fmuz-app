@@ -23,7 +23,7 @@ function CustomDatetime(props) {
       {...other}
       ref={inputRef}
       dateFormat={"DD/MM/YYYY"}
-      timeFormat={"HH:mm"}
+      timeFormat={false}
       closeOnSelect={false}
     />
   );

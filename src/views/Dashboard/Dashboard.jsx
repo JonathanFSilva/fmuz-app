@@ -38,6 +38,7 @@ const initialState = {
   nodes: [{ id: undefined, mac: '', location: '' }],
   humiditys: [{ meta: '', value: undefined }],
   temperatures: [{ meta: '', value: undefined }],
+  leafWetness: [{ meta: '', value: undefined}],
   activeNode: 0,
 }
 
@@ -79,14 +80,16 @@ class Dashboard extends React.PureComponent {
 
     const humiditys = [];
     const temperatures = [];
+    const leafWetness = [];
 
     data.forEach((item) => {
       labels.push(item.created_at);
       humiditys.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.humidity });
       temperatures.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.temperature });
+      leafWetness.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.leafWetness })
     });
 
-    this.setState({ labels, humiditys, temperatures });
+    this.setState({ labels, humiditys, temperatures, leafWetness });
   }
 
   handleChangeChart = (index, title, color) => {
@@ -103,7 +106,7 @@ class Dashboard extends React.PureComponent {
 
   render() {
     const { classes } = this.props;
-    const { labels, temperatures, humiditys, index, title, color, nodes, activeNode } = this.state;
+    const { labels, temperatures, humiditys, leafWetness, index, title, color, nodes, activeNode } = this.state;
     return (
       <div>
         <GridContainer>
@@ -156,7 +159,7 @@ class Dashboard extends React.PureComponent {
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Molhamento</p>
-                <h3 className={classes.cardTitle}>{!!humiditys ? humiditys[humiditys.length - 1].value : ''}%</h3>
+                <h3 className={classes.cardTitle}>{!!leafWetness ? leafWetness[leafWetness.length - 1].value : ''}%</h3>
               </CardHeader>
               <CardFooter></CardFooter>
             </Card>
@@ -179,8 +182,8 @@ class Dashboard extends React.PureComponent {
                     : null
                 }
                 {
-                  index === 3 && !!humiditys
-                    ? <LineChart data={{ labels, series: [humiditys] } || {}} labelY="%" serie="Molhamento Foliar" />
+                  index === 3 && !!leafWetness
+                    ? <LineChart data={{ labels, series: [leafWetness] } || {}} labelY="%" serie="Molhamento Foliar" />
                     : null
                 }
               </CardHeader>

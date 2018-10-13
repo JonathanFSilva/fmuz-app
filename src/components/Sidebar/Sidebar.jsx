@@ -15,6 +15,8 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Icon from "@material-ui/core/Icon";
 
+import Dropdown from "./Dropdown";
+
 import sidebarStyle from "../../assets/jss/fruticulture/components/sidebarStyle.jsx";
 import userImage from "../../assets/img/faces/user.jpeg";
 import UserContent from "./UserContent";
@@ -27,7 +29,8 @@ const authService = new AuthService();
 const Sidebar = ({ ...props }) => {
   // verifies if routeName is the one active (in browser input)
   function activeRoute(routeName) {
-    return props.location.pathname.indexOf(routeName) > -1 ? true : false;
+    // return props.location.pathname.indexOf(routeName) > -1 ? true : false;
+    return props.location.pathname === routeName ? true : false;
   }
   const { classes, color, logo, image, logoText, routes } = props;
 
@@ -35,7 +38,7 @@ const Sidebar = ({ ...props }) => {
     <List className={classes.list}>
       {
         routes.map((prop, key) => {
-          if (prop.redirect || prop.hidden) return null;
+          if (prop.redirect || prop.rootId > 0) return null;
 
           if (prop.admin && !authService.isAdmin()) return null;
 
@@ -52,29 +55,44 @@ const Sidebar = ({ ...props }) => {
           const whiteFontClasses = classNames({
             [" " + classes.whiteFont]: activeRoute(prop.path)
           });
-          return (
-            <NavLink
-              to={prop.path}
-              className={classes.item}
-              activeClassName="active"
-              key={key}
-            >
-              <ListItem button className={classes.itemLink + listItemClasses}>
-                <ListItemIcon className={classes.itemIcon + whiteFontClasses}>
-                  {typeof prop.icon === "string" ? (
-                    <Icon>{prop.icon}</Icon>
-                  ) : (
-                      <prop.icon />
-                    )}
-                </ListItemIcon>
-                <ListItemText
-                  primary={prop.sidebarName}
-                  className={classes.itemText + whiteFontClasses}
-                  disableTypography={true}
-                />
-              </ListItem>
-            </NavLink>
-          );
+
+          if (prop.dropdown) {
+            const content = [];
+
+            routes.map((item) => {
+              if (item.rootId === prop.id) {
+                content.push(item);
+              }
+            });
+
+            return (
+              <Dropdown color={color} pathname={props.location.pathname} root={prop} content={content} />
+            );
+          } else {
+            return (
+              <NavLink
+                to={prop.path}
+                className={classes.item}
+                activeClassName="active"
+                key={key}
+              >
+                <ListItem button className={classes.itemLink + listItemClasses}>
+                  <ListItemIcon className={classes.itemIcon + whiteFontClasses}>
+                    {typeof prop.icon === "string" ? (
+                      <Icon>{prop.icon}</Icon>
+                    ) : (
+                        <prop.icon />
+                      )}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={prop.sidebarName}
+                    className={classes.itemText + whiteFontClasses}
+                    disableTypography={true}
+                  />
+                </ListItem>
+              </NavLink>
+            );
+          }
         })}
     </List>
   );

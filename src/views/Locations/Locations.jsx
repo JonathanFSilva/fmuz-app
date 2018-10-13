@@ -81,12 +81,16 @@ class Locations extends React.Component {
               id: item.id,
               name: item.name,
               description: item.description,
-              created_at: Moment(item.created_at).format("DD/MM/YYYY HH:mm")
+              max_humidity: !!item.max_humidity ? item.max_humidity + '%' : '---',
+              min_humidity: !!item.min_humidity ? item.min_humidity + '%' : '---',
+              max_temperature: !!item.max_temperature ? item.max_temperature + '%' : '---',
+              min_temperature: !!item.min_temperature ? item.min_temperature + '%' : '---',
+              updated_at: Moment(item.updated_at).format("DD/MM/YYYY HH:mm")
             }
           );
         });
 
-        this.setState({ locations });
+        this.setState({ locations }, () => { console.log(this.state) });
       });
   };
 
@@ -165,7 +169,11 @@ class Locations extends React.Component {
                     { label: 'ID', key: 'id' },
                     { label: 'Nome', key: 'name' },
                     { label: 'Descrição', key: 'description' },
-                    { label: 'Data de Criação', key: 'created_at' }
+                    { label: 'Max. Temp.', key: 'max_temperature' },
+                    { label: 'Min. Temp.', key: 'min_temperature' },
+                    { label: 'Max. Umi.', key: 'max_humidity' },
+                    { label: 'Min. Umi.', key: 'min_humidity' },
+                    { label: 'Última alteração', key: 'updated_at' }
                   ]}
                   tableData={this.state.locations || []}
                   openModal={this.openEditModal}

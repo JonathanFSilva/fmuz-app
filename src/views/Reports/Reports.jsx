@@ -118,11 +118,34 @@ class Reports extends React.PureComponent {
           data.map((item, key) => {
             result.push(
               {
-                id: key,
-                data: Moment(item.created_at).format("DD/MM/YYYY HH:mm"),
-                temperatura: `${item.temperature} ºC`,
-                umidade: `${item.humidity}%`,
-                molhamento: `${item.leafWetness}%`
+                data: Moment(item.created_at).format("DD/MM/YYYY"),
+                umidade: `${item.humidity.toFixed(2)}%`,
+                molhamento: `${item.leafWetness.toFixed(2)}%`,
+                temperatura: `${item.temperature.toFixed(2)}ºC`,
+                // umidade:
+                //   <Tooltip
+                //     title={<span>{"Max: " + item.max_humidity.toFixed(2) + '%'}<br />{"Min: " + item.min_humidity.toFixed(2) + '%'}</span>}
+                //     classes={{ tooltip: this.props.classes.tooltip }}
+                //     placement="top"
+                //   >
+                //     <p>{item.humidity.toFixed(2) + '%'}</p>
+                //   </Tooltip>,
+                // molhamento:
+                //   <Tooltip
+                //     title={<span>{"Max: " + item.max_leafWetness.toFixed(2) + '%'}<br />{"Min: " + item.min_leafWetness.toFixed(2) + '%'}</span>}
+                //     classes={{ tooltip: this.props.classes.tooltip }}
+                //     placement="top"
+                //   >
+                //     <p>{item.leafWetness.toFixed(2) + '%'}</p>
+                //   </Tooltip>,
+                // temperatura:
+                //   <Tooltip
+                //     title={<span>{"Max: " + item.max_temperature.toFixed(2) + '%'}<br />{"Min: " + item.min_temperature.toFixed(2) + '%'}</span>}
+                //     classes={{ tooltip: this.props.classes.tooltip }}
+                //     placement="top"
+                //   >
+                //     <p>{item.temperature.toFixed(2) + '%'}</p>
+                //   </Tooltip>,
               }
             );
           });
@@ -130,7 +153,8 @@ class Reports extends React.PureComponent {
           this.setState({ measurementReport: result });
         })
         .catch((err) => {
-          // this.props.showNotification('Não foi possível atualizar o cadastro', 'danger', 'tr');
+          console.log(err);
+          // this.props.showNotification('Não foi possível gerar o relatório.', 'danger', 'tr');
         })
     }
   };
@@ -233,13 +257,12 @@ class Reports extends React.PureComponent {
             <DataTable
               tableHeaderColor="success"
               tableHead={[
-                { label: 'ID', key: 'id' },
                 { label: 'Data', key: 'data' },
-                { label: 'Temperatura', key: 'temperatura' },
-                { label: 'Umidade', key: 'umidade' },
-                { label: 'Molhamento Foliar', key: 'molhamento' }
+                { label: 'Temperatura (ºC)', key: 'temperatura' },
+                { label: 'Umidade (%)', key: 'umidade' },
+                { label: 'Molhamento Foliar (%)', key: 'molhamento' }
               ]}
-              tableData={this.state.measurementReport || []}
+              tableData={measurementReport || []}
             />
           </CardBody>
         </Card>

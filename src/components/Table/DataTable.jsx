@@ -12,6 +12,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 // @material-ui/icons
 import Edit from "@material-ui/icons/Edit";
 import Delete from "@material-ui/icons/Delete";
+import Visibility from "@material-ui/icons/Visibility";
 
 import tableStyle from "../../assets/jss/fruticulture/components/tableStyle.jsx";
 
@@ -45,9 +46,10 @@ function getSorting(order, orderBy) {
 
 function getKeys(tableHead) {
   const keys = [];
-  
+
   tableHead.map((el) => {
     keys.push(el.key);
+    return true;
   });
 
   return keys;
@@ -82,7 +84,7 @@ class DataTable extends React.Component {
   };
 
   render() {
-    const { classes, action, tableHead, tableData, tableHeaderColor, openModal, deleteItem } = this.props;
+    const { classes, action, tableHead, tableData, tableHeaderColor, openModal, deleteItem, showItem } = this.props;
     const { order, orderBy, rowsPerPage, page } = this.state;
 
     return (
@@ -121,18 +123,35 @@ class DataTable extends React.Component {
                           })
                         }
                         {
-                          action
-                            ? <TableCell className={classes.tableCell} numeric>
-                              <Tooltip title="Editar" placement="top" classes={{ tooltip: classes.tooltip }}>
-                                <IconButton className={classes.action} onClick={() => openModal(prop.id)}>
-                                  <Edit className={classes.actionIcon} />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Excluir" placement="top" classes={{ tooltip: classes.tooltip }}>
-                                <IconButton className={classes.action} onClick={() => deleteItem(prop.id)}>
-                                  <Delete className={classes.actionIcon} />
-                                </IconButton>
-                              </Tooltip>
+                          !!action && action.length > 0
+                            ?
+                            <TableCell className={classes.tableCell} numeric>
+                              {
+                                action.indexOf('view') > -1 &&
+                                <Tooltip title="Vizualizar" placement="top" classes={{ tooltip: classes.tooltip }}>
+                                  <IconButton className={classes.action} onClick={() => showItem(prop)}>
+                                    <Visibility className={classes.actionIcon} />
+                                  </IconButton>
+                                </Tooltip>
+                              }
+
+                              {
+                                action.indexOf('edit') > -1 &&
+                                <Tooltip title="Editar" placement="top" classes={{ tooltip: classes.tooltip }}>
+                                  <IconButton className={classes.action} onClick={() => openModal(prop.id)}>
+                                    <Edit className={classes.actionIcon} />
+                                  </IconButton>
+                                </Tooltip>
+                              }
+
+                              {
+                                action.indexOf('delete') > -1 &&
+                                <Tooltip title="Excluir" placement="top" classes={{ tooltip: classes.tooltip }}>
+                                  <IconButton className={classes.action} onClick={() => deleteItem(prop.id)}>
+                                    <Delete className={classes.actionIcon} />
+                                  </IconButton>
+                                </Tooltip>
+                              }
                             </TableCell>
                             : null
                         }
@@ -140,7 +159,7 @@ class DataTable extends React.Component {
                     );
                   })
                 : <TableRow>
-                  <TableCell style={{ textAlign: "center" }} colSpan={tableHead.length}>
+                  <TableCell style={{ textAlign: "center" }} colSpan={!!action && action.length > 0 ? tableHead.length + 1 : tableHead.length}>
                     {"Nenhum dado encontrado!"}
                   </TableCell>
                 </TableRow>

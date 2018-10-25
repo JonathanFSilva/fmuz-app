@@ -5,6 +5,7 @@ import { Redirect, Router, Route, Switch } from "react-router-dom";
 
 import "./assets/css/fruticulture.css";
 import "./assets/css/datetime.css";
+import "moment/locale/pt-br";
 
 import indexRoutes from "./routes/index.jsx";
 

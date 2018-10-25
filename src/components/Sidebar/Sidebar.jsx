@@ -38,9 +38,8 @@ const Sidebar = ({ ...props }) => {
     <List className={classes.list}>
       {
         routes.map((prop, key) => {
-          if (prop.redirect || prop.rootId > 0) return null;
 
-          if (prop.admin && !authService.isAdmin()) return null;
+          if (prop.redirect || prop.sidebarName === undefined || (prop.admin && !authService.isAdmin())) return null;
 
           var listItemClasses;
           if (prop.sidebarName === "Sair") {
@@ -57,16 +56,8 @@ const Sidebar = ({ ...props }) => {
           });
 
           if (prop.dropdown) {
-            const content = [];
-
-            routes.map((item) => {
-              if (item.rootId === prop.id) {
-                content.push(item);
-              }
-            });
-
             return (
-              <Dropdown color={color} pathname={props.location.pathname} root={prop} content={content} />
+              <Dropdown color={color} pathname={props.location.pathname} root={prop} content={prop.routes} key={key} />
             );
           } else {
             return (

@@ -14,6 +14,10 @@ import Icon from "@material-ui/core/Icon";
 
 import SidebarStyles from "../../assets/jss/fruticulture/components/sidebarStyle";
 
+import AuthService from "../../services/auth";
+
+const authService = new AuthService();
+
 const initialState = {
   open: false
 }
@@ -33,7 +37,7 @@ class Dropdown extends React.Component {
   }
 
   handleToggle = () => {
-    this.setState({ open: !this.state.open }, () => { console.log(this.state) });
+    this.setState({ open: !this.state.open });
   }
 
   render() {
@@ -45,7 +49,7 @@ class Dropdown extends React.Component {
     }
 
     function activeRoute(routeName) {
-      return pathname === routeName ? true : false;
+      return pathname === routeName || pathname.indexOf(routeName) > -1 ? true : false;
     }
 
     return (
@@ -78,6 +82,8 @@ class Dropdown extends React.Component {
           open || childrenActive(root.path)
             ?
             content.map((item, key) => {
+
+              if (item.redirect || item.sidebarName === undefined || (item.admin && !authService.isAdmin())) return null;
 
               var listItemClasses;
               listItemClasses = classNames({

@@ -74,6 +74,7 @@ CustomSelect.propTypes = {
   inputRef: PropTypes.func.isRequired,
 };
 
+// eslint-disable-next-line
 CustomSelect = withStyles(dropdownStyle)(CustomSelect);
 
 

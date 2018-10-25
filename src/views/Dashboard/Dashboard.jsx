@@ -64,6 +64,7 @@ class Dashboard extends React.PureComponent {
       })
 
     this.getMeasurementList();
+    setInterval(this.getMeasurementList, 60000);
   };
 
   getMeasurementList = async (qtde = 30) => {
@@ -112,7 +113,7 @@ class Dashboard extends React.PureComponent {
         <GridContainer>
           <GridItem xs={12} sm={12} md={4}>
             <Card>
-              <CardHeader color="danger" stats icon>
+              <CardHeader style={{ paddingBottom: "0px" }} color="danger" stats icon>
                 <Tooltip title="Ver gráfico de Temperatura" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                   <CardIcon
                     color="danger"
@@ -199,18 +200,18 @@ class Dashboard extends React.PureComponent {
                     position="static"
                     activeStep={activeNode}
                     nextButton={
-                      <Tooltip title="Próximo nó" placement="bottom" classes={{ tooltip: classes.tooltip }}>
+                      // <Tooltip title="Próximo nó" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                         <Button size="small" onClick={this.handleNext} disabled={activeNode === nodes.length - 1}>
                           <KeyboardArrowRight />
                         </Button>
-                      </Tooltip>
+                      // </Tooltip>
                     }
                     backButton={
-                      <Tooltip title="Nó Anterior" placement="bottom" classes={{ tooltip: classes.tooltip }}>
+                      // <Tooltip title="Nó Anterior" placement="bottom" classes={{ tooltip: classes.tooltip }}>
                         <Button size="small" onClick={this.handleBack} disabled={activeNode === 0}>
                           <KeyboardArrowLeft />
                         </Button>
-                      </Tooltip>
+                      // </Tooltip>
                     }
                     style={{
                       backgroundColor: "transparent",

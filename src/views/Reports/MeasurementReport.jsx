@@ -4,7 +4,7 @@ import FormData from "form-data";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
-import Tooltip from "@material-ui/core/Tooltip";
+// import Tooltip from "@material-ui/core/Tooltip";
 
 import Search from "@material-ui/icons/Search";
 // core components
@@ -36,7 +36,7 @@ const initialState = {
 };
 
 
-class Reports extends React.PureComponent {
+class MeasurementReport extends React.PureComponent {
   constructor() {
     super();
     this.locationService = new LocationService();
@@ -73,6 +73,20 @@ class Reports extends React.PureComponent {
 
   componentDidMount = async () => {
     await this.getAllLocations();
+
+    const params = JSON.parse(localStorage.getItem('@App:report'));
+
+    if (!!params) {
+      await this.setState(
+        {
+          location_id: params.location_id,
+          endDate: Moment(params.endDate),
+          beginDate: Moment(params.beginDate)
+        }
+      );
+    }
+
+    this.filter();
   };
 
   validEndDate = (endDate, state) => (Moment(endDate).diff(state.beginDate, 'days') >= 0);
@@ -91,9 +105,7 @@ class Reports extends React.PureComponent {
     this.setState({ endDate: date });
   };
 
-  filter = async (event) => {
-    event.preventDefault();
-
+  filter = async () => {
     const validation = this.validator.validate(this.state);
     this.setState({ validation });
     this.submited = true;
@@ -107,18 +119,20 @@ class Reports extends React.PureComponent {
       formData.append("beginDate", Moment(beginDate).format("YYYY-MM-DD HH:mm"));
       formData.append("endDate", Moment(endDate).format("YYYY-MM-DD HH:mm"));
 
+      this.saveReportParams();
+
       await this.reportService.measurementReport(formData)
         .then(({ data }) => {
           this.submited = false;
 
           const result = [];
 
-          data.map((item, key) => {
+          data.map(item => {
             result.push({
-              data: Moment(item.created_at).format("DD/MM/YYYY"),
-              umidade: `${item.humidity.toFixed(2)}%`,
-              molhamento: `${item.leafWetness.toFixed(2)}%`,
-              temperatura: `${item.temperature.toFixed(2)}ºC`,
+              date: Moment(item.created_at).format("DD/MM/YYYY"),
+              humidity: `${item.humidity.toFixed(2)}%`,
+              leafWetness: `${item.leafWetness.toFixed(2)}%`,
+              temperature: `${item.temperature.toFixed(2)}ºC`,
             });
             return true;
           });
@@ -145,8 +159,29 @@ class Reports extends React.PureComponent {
       });
   };
 
+  showDetails = (prop) => {
+    const id = this.state.location_id;
+
+    const date = Moment(prop.date, "DD/MM/YYYY").format("YYYY-MM-DD");
+
+    const url = `/reports/measurements/${id}/${date}`;
+    this.props.history.replace(url);
+  };
+
+  saveReportParams = () => {
+    const { beginDate, endDate, location_id } = this.state;
+
+    localStorage.setItem('@App:report', JSON.stringify(
+      {
+        endDate: Moment(endDate).format("YYYY-MM-DD"),
+        beginDate: Moment(beginDate).format("YYYY-MM-DD"),
+        location_id: location_id
+      }
+    ));
+  };
+
   render() {
-    const { classes } = this.props;
+    // const { classes } = this.props;
     const { beginDate, endDate, location_id, locations, measurementReport } = this.state;
     const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
 
@@ -213,11 +248,11 @@ class Reports extends React.PureComponent {
               <GridItem xs={12} sm={12} md={3}>
                 <Grid container justify="center" alignContent="center">
                   <GridItem>
-                    <Tooltip title="Gerar relatório" placement="top" classes={{ tooltip: classes.tooltip }}>
-                      <Button color="success" style={{ marginTop: '27px' }} onClick={this.filter}>
-                        <Search />
-                      </Button>
-                    </Tooltip>
+                    {/* <Tooltip title="Gerar relatório" placement="top" classes={{ tooltip: classes.tooltip }}> */}
+                    <Button color="success" style={{ marginTop: '27px' }} onClick={this.filter}>
+                      <Search />
+                    </Button>
+                    {/* </Tooltip> */}
                   </GridItem>
                 </Grid>
               </GridItem>
@@ -228,14 +263,16 @@ class Reports extends React.PureComponent {
         <Card>
           <CardBody style={{ paddingTop: "0px" }}>
             <DataTable
+              action={["view"]}
               tableHeaderColor="success"
               tableHead={[
-                { label: 'Data', key: 'data' },
-                { label: 'Temperatura (ºC)', key: 'temperatura' },
-                { label: 'Umidade (%)', key: 'umidade' },
-                { label: 'Molhamento Foliar (%)', key: 'molhamento' }
+                { label: 'Data', key: 'date' },
+                { label: 'Temperatura (ºC)', key: 'temperature' },
+                { label: 'Umidade (%)', key: 'humidity' },
+                { label: 'Molhamento Foliar (%)', key: 'leafWetness' }
               ]}
               tableData={measurementReport || []}
+              showItem={this.showDetails}
             />
           </CardBody>
         </Card>
@@ -244,10 +281,10 @@ class Reports extends React.PureComponent {
   }
 }
 
-Reports.propTypes = {
+MeasurementReport.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-Reports = withStyles(dashboardStyle)(Reports);
+MeasurementReport = withStyles(dashboardStyle)(MeasurementReport);
 
-export default withAuthentication(Reports);
+export default withAuthentication(MeasurementReport);

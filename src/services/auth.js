@@ -38,6 +38,7 @@ class AuthService {
   logout = async () => {
     localStorage.removeItem('@App:token');
     localStorage.removeItem('@App:data');
+    localStorage.removeItem('@App:report');
   }
 
   isAdmin = () => {

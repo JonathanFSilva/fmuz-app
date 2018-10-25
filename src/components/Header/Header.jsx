@@ -2,8 +2,8 @@ import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
 // react moment
-import "moment/locale/pt-br";
-import Moment from 'react-moment';
+// import "moment/locale/pt-br";
+// import Moment from 'react-moment';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import AppBar from "@material-ui/core/AppBar";
@@ -52,9 +52,9 @@ function Header({ ...props }) {
             {makeBrand()}
           </Button>
         </div>
-        <Hidden smDown implementation="css">
+        {/* <Hidden smDown implementation="css">
           <Moment format="dddd, D [de] MMMM [de] YYYY - HH:mm:ss" locale="pt-br" interval={1000}></Moment>
-        </Hidden>
+        </Hidden> */}
       </Toolbar>
     </AppBar>
   );

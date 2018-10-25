@@ -157,7 +157,7 @@ class Users extends React.PureComponent {
               </CardHeader>
               <CardBody style={{ paddingTop: "0px" }}>
                 <DataTable
-                  action={true}
+                  action={["edit", "delete"]}
                   tableHeaderColor="success"
                   tableHead={[
                     { label: "ID", key: "id" },

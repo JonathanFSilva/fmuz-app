@@ -5,7 +5,7 @@ import "chartist-plugin-tooltips/dist/chartist-plugin-tooltip.css";
 import ChartistGraph from "react-chartist";
 
 var Chartist = require("chartist");
-var Moment = require("moment");
+// var Moment = require("moment");
 
 require("chartist-plugin-tooltips");
 
@@ -17,13 +17,13 @@ const LineChart = ({ ...props }) => {
     axisY: {
       offset: 50,
       labelInterpolationFnc: function (value) {
-        return `${value}${labelY}`;
+        return `${parseFloat(value).toFixed(1)}${labelY}`;
       }
     },
     axisX: {
-      offset: 50,
+      offset: 10,
       labelInterpolationFnc: function (value) {
-        return Moment(value).format('HH:mm');
+        return; //Moment(value).format('HH:mm');
       }
     },
     lineSmooth: Chartist.Interpolation.cardinal({

@@ -312,15 +312,15 @@ img {
   border-radius: 0.25em;
   font-size: 0.8em !important;
   font-weight: 300 !important;
-  text-align: left !important;
+  text-align: center;
   padding: 10px 15px !important;
+  min-width: 130px !important;
+  max-width: 200px !important;
   /* padding: "10px 15px";
-  min-width: "130px";
   line-height: "1.7em";
   border: "none";
   border-radius: "3px";
   box-shadow: "0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2)";
-  max-width: "200px";
   text-align: "center";
   font-family: '"Helvetica Neue",Helvetica,Arial,sans-serif';
   font-size: "12px";

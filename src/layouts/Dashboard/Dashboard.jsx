@@ -1,9 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withRouter, Switch, Route, Redirect } from "react-router-dom";
-// creates a beautiful scrollbar
-// import "react-perfect-scrollbar/dist/css/styles.css";
-// import PerfectScrollbar from "react-perfect-scrollbar";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 // core components

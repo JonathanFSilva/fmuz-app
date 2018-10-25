@@ -4,11 +4,8 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
 import Grid from "@material-ui/core/Grid";
-// import InputAdornment from "@material-ui/core/InputAdornment";
 // @material-ui/icons
 import AddAlert from "@material-ui/icons/AddAlert";
-// import Email from "@material-ui/icons/Email";
-// import Lock from "@material-ui/icons/Lock";
 import Slide from "@material-ui/core/Slide";
 // core components
 import Button from "../../components/CustomButtons/Button";
@@ -134,7 +131,7 @@ class Login extends React.Component {
           close
         />
 
-        <Grid container alignItems="center" justify="center" className={classes.gridStyle} xs={10} sm={10} md={4}>
+        <Grid container alignItems="center" justify="center" className={classes.gridStyle}>
           <Dialog
             keepMounted
             open={true}

@@ -28,20 +28,18 @@ import NodeService from "../../services/nodes";
 
 import dashboardStyle from "../../assets/jss/fruticulture/views/dashboardStyle.jsx";
 
-
-const Moment = require('moment');
+const Moment = require("moment");
 
 const initialState = {
   index: 1,
-  title: 'Temperatura',
-  color: 'danger',
-  nodes: [{ id: undefined, mac: '', location: '' }],
-  humiditys: [{ meta: '', value: undefined }],
-  temperatures: [{ meta: '', value: undefined }],
-  leafWetness: [{ meta: '', value: undefined}],
-  activeNode: 0,
-}
-
+  title: "Temperatura",
+  color: "danger",
+  nodes: [{ id: undefined, mac: "", location: "" }],
+  humiditys: [{ meta: "", value: undefined }],
+  temperatures: [{ meta: "", value: undefined }],
+  leafWetness: [{ meta: "", value: undefined }],
+  activeNode: 0
+};
 
 class Dashboard extends React.PureComponent {
   constructor() {
@@ -52,16 +50,15 @@ class Dashboard extends React.PureComponent {
   }
 
   componentDidMount = async () => {
-    await this.nodeService.getAll()
-      .then(({ data }) => {
-        const nodes = [];
+    await this.nodeService.getAll().then(({ data }) => {
+      const nodes = [];
 
-        data.forEach((item) => {
-          nodes.push({ id: item.id, mac: item.mac_address, location: item.name });
-        });
+      data.forEach(item => {
+        nodes.push({ id: item.id, mac: item.mac_address, location: item.name });
+      });
 
-        this.setState({ nodes });
-      })
+      this.setState({ nodes });
+    });
 
     this.getMeasurementList();
     setInterval(this.getMeasurementList, 60000);
@@ -70,99 +67,161 @@ class Dashboard extends React.PureComponent {
   getMeasurementList = async (qtde = 30) => {
     const id = this.state.nodes[this.state.activeNode].id;
 
-    await this.measurementService.getMeasurementList(id, qtde)
+    await this.measurementService
+      .getMeasurementList(id, qtde)
       .then(({ data }) => {
+        console.log(data);
         this.setDataChart(data);
-      })
+      });
   };
 
-  setDataChart = (data) => {
+  setDataChart = data => {
     const labels = [];
 
     const humiditys = [];
     const temperatures = [];
     const leafWetness = [];
 
-    data.forEach((item) => {
+    data.forEach(item => {
       labels.push(item.created_at);
-      humiditys.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.humidity });
-      temperatures.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.temperature });
-      leafWetness.push({ meta: Moment(item.created_at).format('d/MM/YYYY HH:mm:ss'), value: item.leafWetness })
+      humiditys.push({
+        meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
+        value: item.humidity
+      });
+      temperatures.push({
+        meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
+        value: item.temperature
+      });
+      leafWetness.push({
+        meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
+        value: item.leafWetness
+      });
     });
 
     this.setState({ labels, humiditys, temperatures, leafWetness });
-  }
+  };
 
   handleChangeChart = (index, title, color) => {
     this.setState({ index, title, color });
   };
 
   handleNext = () => {
-    this.setState({ activeNode: this.state.activeNode + 1 }, () => { this.getMeasurementList() });
+    this.setState({ activeNode: this.state.activeNode + 1 }, () => {
+      this.getMeasurementList();
+    });
   };
 
   handleBack = () => {
-    this.setState({ activeNode: this.state.activeNode - 1 }, () => { this.getMeasurementList() });
+    this.setState({ activeNode: this.state.activeNode - 1 }, () => {
+      this.getMeasurementList();
+    });
   };
 
   render() {
     const { classes } = this.props;
-    const { labels, temperatures, humiditys, leafWetness, index, title, color, nodes, activeNode } = this.state;
+    const {
+      labels,
+      temperatures,
+      humiditys,
+      leafWetness,
+      index,
+      title,
+      color,
+      nodes,
+      activeNode
+    } = this.state;
     return (
       <div>
         <GridContainer>
           <GridItem xs={12} sm={12} md={4}>
             <Card>
-              <CardHeader style={{ paddingBottom: "0px" }} color="danger" stats icon>
-                <Tooltip title="Ver gráfico de Temperatura" placement="bottom" classes={{ tooltip: classes.tooltip }}>
+              <CardHeader
+                style={{ paddingBottom: "0px" }}
+                color="danger"
+                stats
+                icon
+              >
+                <Tooltip
+                  title="Ver gráfico de Temperatura"
+                  placement="bottom"
+                  classes={{ tooltip: classes.tooltip }}
+                >
                   <CardIcon
                     color="danger"
                     style={{ cursor: "pointer" }}
-                    onClick={() => this.handleChangeChart(1, 'Temperatura', 'danger')}
+                    onClick={() =>
+                      this.handleChangeChart(1, "Temperatura", "danger")
+                    }
                   >
-                    <img alt="thermometer-icon" className="icon" src={thermometer} />
+                    <img
+                      alt="thermometer-icon"
+                      className="icon"
+                      src={thermometer}
+                    />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Temperatura</p>
-                <h3 className={classes.cardTitle}>{!!temperatures ? temperatures[temperatures.length - 1].value : ''}ºC</h3>
+                <h3 className={classes.cardTitle}>
+                  {!!temperatures
+                    ? temperatures[temperatures.length - 1].value
+                    : ""}
+                  ºC
+                </h3>
               </CardHeader>
-              <CardFooter></CardFooter>
+              <CardFooter />
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="info" stats icon>
-                <Tooltip title="Ver gráfico de Umidade" placement="bottom" classes={{ tooltip: classes.tooltip }}>
+                <Tooltip
+                  title="Ver gráfico de Umidade"
+                  placement="bottom"
+                  classes={{ tooltip: classes.tooltip }}
+                >
                   <CardIcon
                     color="info"
                     style={{ cursor: "pointer" }}
-                    onClick={() => this.handleChangeChart(2, 'Umidade', 'info')}
+                    onClick={() => this.handleChangeChart(2, "Umidade", "info")}
                   >
                     <img alt="humidity-icon" className="icon" src={humidity} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Umidade</p>
-                <h3 className={classes.cardTitle}>{!!humiditys ? humiditys[humiditys.length - 1].value : ''}%</h3>
+                <h3 className={classes.cardTitle}>
+                  {!!humiditys ? humiditys[humiditys.length - 1].value : ""}%
+                </h3>
               </CardHeader>
-              <CardFooter></CardFooter>
+              <CardFooter />
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="success" stats icon>
-                <Tooltip title="Ver gráfico de Molhamento Foliar" placement="bottom" classes={{ tooltip: classes.tooltip }}>
+                <Tooltip
+                  title="Ver gráfico de Molhamento Foliar"
+                  placement="bottom"
+                  classes={{ tooltip: classes.tooltip }}
+                >
                   <CardIcon
                     color="success"
                     style={{ cursor: "pointer" }}
-                    onClick={() => this.handleChangeChart(3, 'Molhamento Foliar', 'success')}
+                    onClick={() =>
+                      this.handleChangeChart(3, "Molhamento Foliar", "success")
+                    }
                   >
                     <img alt="leaf-wetness-icon" className="icon" src={leaf} />
                   </CardIcon>
                 </Tooltip>
                 <p className={classes.cardCategory}>Molhamento</p>
-                <h3 className={classes.cardTitle}>{!!leafWetness ? leafWetness[leafWetness.length - 1].value : ''}%</h3>
+                <h3 className={classes.cardTitle}>
+                  {!!leafWetness
+                    ? leafWetness[leafWetness.length - 1].value
+                    : ""}
+                  %
+                </h3>
               </CardHeader>
-              <CardFooter></CardFooter>
+              <CardFooter />
             </Card>
           </GridItem>
         </GridContainer>
@@ -171,26 +230,36 @@ class Dashboard extends React.PureComponent {
           <GridItem xs={12} sm={12} md={12}>
             <Card chart>
               <CardHeader color={color}>
-                <center><h3 className={classes.cardTitleWhite}>{title}</h3></center>
-                {
-                  index === 1 && !!temperatures
-                    ? <LineChart data={{ labels, series: [temperatures] } || {}} labelY="ºC" serie="Temperatura" />
-                    : null
-                }
-                {
-                  index === 2 && !!humiditys
-                    ? <LineChart data={{ labels, series: [humiditys] } || {}} labelY="%" serie="Umidade" />
-                    : null
-                }
-                {
-                  index === 3 && !!leafWetness
-                    ? <LineChart data={{ labels, series: [leafWetness] } || {}} labelY="%" serie="Molhamento Foliar" />
-                    : null
-                }
+                <center>
+                  <h3 className={classes.cardTitleWhite}>{title}</h3>
+                </center>
+                {index === 1 && !!temperatures ? (
+                  <LineChart
+                    data={{ labels, series: [temperatures] } || {}}
+                    labelY="ºC"
+                    serie="Temperatura"
+                  />
+                ) : null}
+                {index === 2 && !!humiditys ? (
+                  <LineChart
+                    data={{ labels, series: [humiditys] } || {}}
+                    labelY="%"
+                    serie="Umidade"
+                  />
+                ) : null}
+                {index === 3 && !!leafWetness ? (
+                  <LineChart
+                    data={{ labels, series: [leafWetness] } || {}}
+                    labelY="%"
+                    serie="Molhamento Foliar"
+                  />
+                ) : null}
               </CardHeader>
               <CardBody>
                 <p className={classes.cardCategory}>Localização</p>
-                <h4 className={classes.cardTitle}>{nodes[activeNode].location || ''}</h4>
+                <h4 className={classes.cardTitle}>
+                  {nodes[activeNode].location || ""}
+                </h4>
               </CardBody>
               <CardFooter chart>
                 <GridItem xs={12} sm={12} md={12}>
@@ -201,20 +270,28 @@ class Dashboard extends React.PureComponent {
                     activeStep={activeNode}
                     nextButton={
                       // <Tooltip title="Próximo nó" placement="bottom" classes={{ tooltip: classes.tooltip }}>
-                        <Button size="small" onClick={this.handleNext} disabled={activeNode === nodes.length - 1}>
-                          <KeyboardArrowRight />
-                        </Button>
+                      <Button
+                        size="small"
+                        onClick={this.handleNext}
+                        disabled={activeNode === nodes.length - 1}
+                      >
+                        <KeyboardArrowRight />
+                      </Button>
                       // </Tooltip>
                     }
                     backButton={
                       // <Tooltip title="Nó Anterior" placement="bottom" classes={{ tooltip: classes.tooltip }}>
-                        <Button size="small" onClick={this.handleBack} disabled={activeNode === 0}>
-                          <KeyboardArrowLeft />
-                        </Button>
+                      <Button
+                        size="small"
+                        onClick={this.handleBack}
+                        disabled={activeNode === 0}
+                      >
+                        <KeyboardArrowLeft />
+                      </Button>
                       // </Tooltip>
                     }
                     style={{
-                      backgroundColor: "transparent",
+                      backgroundColor: "transparent"
                     }}
                     classes={{
                       dotActive: "dot-active"
@@ -225,7 +302,7 @@ class Dashboard extends React.PureComponent {
             </Card>
           </GridItem>
         </GridContainer>
-      </div >
+      </div>
     );
   }
 }

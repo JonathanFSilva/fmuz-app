@@ -22,6 +22,7 @@ import CardIcon from "../../components/Card/CardIcon.jsx";
 import CardBody from "../../components/Card/CardBody.jsx";
 import DataTable from "../../components/Table/DataTable.jsx";
 import GridItem from "../../components/Grid/GridItem.jsx";
+import Loading from "../../components/Loading/Loading";
 import Snackbar from "../../components/Snackbar/Snackbar";
 
 import UsersFormModal from "./UsersFormModal.jsx";
@@ -38,6 +39,7 @@ class Users extends React.PureComponent {
     this.userService = new UserService();
     this.state = {
       users: [],
+      loading: true,
       confirmDeleteOpen: false,
       modalFormOpen: false,
       modalType: 'Cadastrar',
@@ -66,6 +68,8 @@ class Users extends React.PureComponent {
   };
 
   getAllUsers = async () => {
+    this.setState({ loading: true });
+
     await this.userService.getAll()
       .then(({ data }) => {
         const users = [];
@@ -84,19 +88,21 @@ class Users extends React.PureComponent {
           );
         });
 
-        this.setState({ users });
+        this.setState({ loading: false, users });
       });
   }
 
   deleteUser = async () => {
+    this.setState({ loading: true });
     await this.userService.delete(this.state.deleteId)
       .then(({ data }) => {
-        this.setState({ deleteId: undefined });
+        this.setState({ loading: false, deleteId: undefined });
         this.getAllUsers();
         this.handleCloseConfirmDelete();
         this.showNotification('Usuário excluido com sucesso!', 'success', 'tr');
       })
       .catch((err) => {
+        this.setState({ loading: false });
         this.showNotification('Não foi possível excluir o usuário!', 'danger', 'tr');
       })
   }
@@ -155,21 +161,26 @@ class Users extends React.PureComponent {
                 </CardIcon>
                 <h3 className={classes.cardTitle}>Usuários do sistema</h3>
               </CardHeader>
-              <CardBody style={{ paddingTop: "0px" }}>
-                <DataTable
-                  action={["edit", "delete"]}
-                  tableHeaderColor="success"
-                  tableHead={[
-                    { label: "ID", key: "id" },
-                    { label: "Nome", key: "name" },
-                    { label: "E-mail", key: "email" },
-                    { label: "Usuário", key: "username" },
-                    { label: "Admnistrador", key: "is_admin" },
-                  ]}
-                  tableData={this.state.users || []}
-                  openModal={this.openEditModal}
-                  deleteItem={this.handleOpenConfirmDelete}
-                />
+              <CardBody style={{ paddingTop: "0px" }} align="center">
+                {
+                  this.state.loading
+                    ? <Loading />
+                    :
+                    <DataTable
+                      action={["edit", "delete"]}
+                      tableHeaderColor="success"
+                      tableHead={[
+                        { label: "ID", key: "id" },
+                        { label: "Nome", key: "name" },
+                        { label: "E-mail", key: "email" },
+                        { label: "Usuário", key: "username" },
+                        { label: "Admnistrador", key: "is_admin" },
+                      ]}
+                      tableData={this.state.users || []}
+                      openModal={this.openEditModal}
+                      deleteItem={this.handleOpenConfirmDelete}
+                    />
+                }
               </CardBody>
             </Card>
           </GridItem>

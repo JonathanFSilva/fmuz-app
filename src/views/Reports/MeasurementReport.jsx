@@ -13,8 +13,9 @@ import Card from "../../components/Card/Card";
 import CardBody from "../../components/Card/CardBody";
 import DataTable from "../../components/Table/DataTable";
 import DatePicker from "../../components/DatePicker/DatePicker";
+import GridItem from "../../components/Grid/GridItem";
+import Loading from "../../components/Loading/Loading";
 import SelectInput from "../../components/SelectInput/SelectInput";
-import GridItem from "../../components/Grid/GridItem.jsx";
 
 import FormValidator from "../../validations/FormValidator";
 import ReportService from "../../services/reports";
@@ -30,9 +31,10 @@ const Moment = require('moment');
 const initialState = {
   beginDate: Moment(),
   endDate: Moment(),
-  location_id: '',
-  locations: [],
   measurementReport: [],
+  locations: [],
+  location_id: '',
+  loading: false,
 };
 
 
@@ -71,7 +73,7 @@ class MeasurementReport extends React.PureComponent {
     this.submited = false;
   };
 
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     await this.getAllLocations();
 
     const params = JSON.parse(localStorage.getItem('@App:report'));
@@ -88,6 +90,10 @@ class MeasurementReport extends React.PureComponent {
 
     this.filter();
   };
+
+  componentWillUnmount = () => {
+    console.log('unmounting...');
+  }
 
   validEndDate = (endDate, state) => (Moment(endDate).diff(state.beginDate, 'days') >= 0);
 
@@ -111,6 +117,8 @@ class MeasurementReport extends React.PureComponent {
     this.submited = true;
 
     if (validation.isValid) {
+      this.setState({ loading: true });
+
       const { location_id, beginDate, endDate } = this.state;
 
       const formData = new FormData();
@@ -137,11 +145,12 @@ class MeasurementReport extends React.PureComponent {
             return true;
           });
 
-          this.setState({ measurementReport: result });
+          this.setState({ loading: false, measurementReport: result });
         })
         .catch((err) => {
-          console.log(err);
-          // this.props.showNotification('Não foi possível gerar o relatório.', 'danger', 'tr');
+          // console.log(err);
+          this.setState({ loading: false });
+          this.props.showNotification('Não foi possível gerar o relatório.', 'danger', 'tr');
         })
     }
   };
@@ -261,19 +270,24 @@ class MeasurementReport extends React.PureComponent {
         </Card>
 
         <Card>
-          <CardBody style={{ paddingTop: "0px" }}>
-            <DataTable
-              action={["view"]}
-              tableHeaderColor="success"
-              tableHead={[
-                { label: 'Data', key: 'date' },
-                { label: 'Temperatura (ºC)', key: 'temperature' },
-                { label: 'Umidade (%)', key: 'humidity' },
-                { label: 'Molhamento Foliar (%)', key: 'leafWetness' }
-              ]}
-              tableData={measurementReport || []}
-              showItem={this.showDetails}
-            />
+          <CardBody style={{ paddingTop: "0px" }} align="center">
+            {
+              this.state.loading
+                ? <Loading />
+                :
+                <DataTable
+                  action={["view"]}
+                  tableHeaderColor="success"
+                  tableHead={[
+                    { label: 'Data', key: 'date' },
+                    { label: 'Temperatura (ºC)', key: 'temperature' },
+                    { label: 'Umidade (%)', key: 'humidity' },
+                    { label: 'Molhamento Foliar (%)', key: 'leafWetness' }
+                  ]}
+                  tableData={measurementReport || []}
+                  showItem={this.showDetails}
+                />
+            }
           </CardBody>
         </Card>
       </div>

@@ -14,6 +14,7 @@ import CardBody from "../../components/Card/CardBody";
 import CardHeader from "../../components/Card/CardHeader";
 import CustomInput from "../../components/CustomInput/CustomInput";
 import GridItem from "../../components/Grid/GridItem";
+import Loading from "../../components/Loading/Loading";
 import Snackbar from "../../components/Snackbar/Snackbar";
 
 import background from "../../assets/img/sidebar.jpg";
@@ -61,6 +62,7 @@ class Login extends React.Component {
       }
     ]);
     this.state = {
+      loading: false,
       username: '',
       password: '',
       notificationOpen: false,
@@ -99,10 +101,12 @@ class Login extends React.Component {
     this.submited = true;
 
     if (validation.isValid) {
+      this.setState({ loading: true });
       try {
         await this.authService.login(this.state.username, this.state.password);
         this.props.history.replace('/');
       } catch (err) {
+        this.setState({ loading: false });
         this.showNotification('Falha na autenticação!', 'danger');
       }
     }
@@ -208,9 +212,14 @@ class Login extends React.Component {
                     </GridItem>
                     <GridItem align="center">
                       <div className={classes.buttonContainer}>
-                        <Button type="button" color="success" onClick={this.onFormSubmit}>
-                          Entrar
-                      </Button>
+                        {
+                          this.state.loading
+                            ? <Loading />
+                            :
+                            <Button type="button" color="success" onClick={this.onFormSubmit}>
+                              {'Entrar'}
+                            </Button>
+                        }
                       </div>
                     </GridItem>
                   </Grid>

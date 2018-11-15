@@ -15,6 +15,7 @@ import CardIcon from "../../components/Card/CardIcon.jsx";
 import CardBody from "../../components/Card/CardBody.jsx";
 import DataTable from "../../components/Table/DataTable.jsx";
 import GridItem from "../../components/Grid/GridItem.jsx";
+import Loading from "../../components/Loading/Loading";
 
 import UserService from "../../services/user.js";
 import ReportsService from "../../services/reports.js";
@@ -26,7 +27,8 @@ const Moment = require('moment');
 
 const initialState = {
   tableData: [],
-  tableHead: []
+  tableHead: [],
+  loading: true
 };
 
 const measurementHead = [
@@ -63,6 +65,7 @@ class ReportDetails extends React.PureComponent {
   };
 
   getMeasurementReport = async (location_id, date) => {
+    this.setState({ loading: true });
 
     const formData = new FormData();
 
@@ -84,11 +87,12 @@ class ReportDetails extends React.PureComponent {
           return true;
         });
 
-        this.setState({ tableData: result });
+        this.setState({ loading: false, tableData: result });
       })
       .catch((err) => {
-        console.log(err);
-        // this.props.showNotification('Não foi possível gerar o relatório.', 'danger', 'tr');
+        // console.log(err);
+        this.setState({ loading: false });
+        this.props.showNotification('Não foi possível gerar o relatório.', 'danger', 'tr');
       })
   };
 
@@ -115,14 +119,19 @@ class ReportDetails extends React.PureComponent {
               </CardIcon>
               <h3 className={classes.cardTitle}>{`Relatório do dia ${Moment(date).format('D [de] MMMM [de] YYYY')}`}</h3>
             </CardHeader>
-            <CardBody style={{ paddingTop: "0px" }}>
-              <DataTable
-                tableHeaderColor="success"
-                tableHead={tableHead || []}
-                tableData={tableData || []}
-                openModal={this.openEditModal}
-                deleteItem={this.handleOpenConfirmDelete}
-              />
+            <CardBody style={{ paddingTop: "0px" }} align="center">
+              {
+                this.state.loading
+                  ? <Loading />
+                  :
+                  <DataTable
+                    tableHeaderColor="success"
+                    tableHead={tableHead || []}
+                    tableData={tableData || []}
+                    openModal={this.openEditModal}
+                    deleteItem={this.handleOpenConfirmDelete}
+                  />
+              }
             </CardBody>
           </Card>
         </GridItem>

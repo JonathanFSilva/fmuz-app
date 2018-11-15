@@ -24,6 +24,7 @@ import CardIcon from "../../components/Card/CardIcon.jsx";
 import CardBody from "../../components/Card/CardBody.jsx";
 import DataTable from "../../components/Table/DataTable.jsx";
 import GridItem from "../../components/Grid/GridItem.jsx";
+import Loading from "../../components/Loading/Loading.jsx";
 import Snackbar from "../../components/Snackbar/Snackbar";
 
 import NodesFormModal from "./NodesFormModal.jsx";
@@ -42,6 +43,7 @@ class Nodes extends React.Component {
     this.nodeService = new NodeService();
     this.state = {
       nodes: [],
+      loading: true,
       confirmDeleteOpen: false,
       modalFormOpen: false,
       modalType: '',
@@ -70,6 +72,8 @@ class Nodes extends React.Component {
   };
 
   getAllNodes = async () => {
+    this.setState({ loading: true });
+
     await this.nodeService.getAll()
       .then(({ data }) => {
         const nodes = [];
@@ -85,19 +89,22 @@ class Nodes extends React.Component {
           );
         });
 
-        this.setState({ nodes });
+        this.setState({ loading: false, nodes });
       });
   };
 
   deleteNode = async () => {
+    this.setState({ loading: true });
+
     await this.nodeService.delete(this.state.deleteId)
       .then(() => {
-        this.setState({ deleteId: undefined });
+        this.setState({ loading: false, deleteId: undefined });
         this.getAllNodes();
         this.handleCloseConfirmDelete();
         this.showNotification('Nó excluido com sucesso!', 'success', 'tr');
       })
       .catch(() => {
+        this.setState({ loading: false });
         this.showNotification('Não foi possível excluir o nó!', 'danger', 'tr');
       })
   };
@@ -156,20 +163,25 @@ class Nodes extends React.Component {
                 </CardIcon>
                 <h3 className={classes.cardTitle}>Nós da rede</h3>
               </CardHeader>
-              <CardBody style={{ paddingTop: "0px" }}>
-                <DataTable
-                  action={["edit", "delete"]}
-                  tableHeaderColor="success"
-                  tableHead={[
-                    { label: 'ID', key: 'id' },
-                    { label: 'Localização', key: 'location' },
-                    { label: 'MAC', key: 'mac_address' },
-                    { label: 'Data de Criação', key: 'created_at' }
-                  ]}
-                  tableData={this.state.nodes || []}
-                  openModal={this.openEditModal}
-                  deleteItem={this.handleOpenConfirmDelete}
-                />
+              <CardBody style={{ paddingTop: "0px" }} align="center">
+                {
+                  this.state.loading
+                    ? <Loading />
+                    :
+                    <DataTable
+                      action={["edit", "delete"]}
+                      tableHeaderColor="success"
+                      tableHead={[
+                        { label: 'ID', key: 'id' },
+                        { label: 'Localização', key: 'location' },
+                        { label: 'MAC', key: 'mac_address' },
+                        { label: 'Data de Criação', key: 'created_at' }
+                      ]}
+                      tableData={this.state.nodes || []}
+                      openModal={this.openEditModal}
+                      deleteItem={this.handleOpenConfirmDelete}
+                    />
+                }
               </CardBody>
             </Card>
           </GridItem>

@@ -24,6 +24,7 @@ import CardIcon from "../../components/Card/CardIcon";
 import CardBody from "../../components/Card/CardBody";
 import DataTable from "../../components/Table/DataTable";
 import GridItem from "../../components/Grid/GridItem";
+import Loading from "../../components/Loading/Loading";
 import Snackbar from "../../components/Snackbar/Snackbar";
 
 import LocationsFormModal from "./LocationsFormModal.jsx";
@@ -43,6 +44,7 @@ class Locations extends React.Component {
     this.locationService = new LocationService();
     this.state = {
       locations: [],
+      loading: true,
       confirmDeleteOpen: false,
       modalFormOpen: false,
       modalType: '',
@@ -71,6 +73,8 @@ class Locations extends React.Component {
   };
 
   getAllLocations = async () => {
+    this.setState({ loading: true });
+
     await this.locationService.getAll()
       .then(({ data }) => {
         const locations = [];
@@ -90,19 +94,22 @@ class Locations extends React.Component {
           );
         });
 
-        this.setState({ locations }, () => { console.log(this.state) });
+        this.setState({ loading: false, locations });
       });
   };
 
   deleteLocation = async () => {
+    this.setState({ loading: true });
+
     await this.locationService.delete(this.state.deleteId)
       .then(() => {
-        this.setState({ deleteId: undefined });
+        this.setState({ loading: false, deleteId: undefined });
         this.getAllLocations();
         this.handleCloseConfirmDelete();
         this.showNotification('Local excluido com sucesso!', 'success', 'tr');
       })
       .catch(() => {
+        this.setState({ loading: false });
         this.showNotification('Não foi possível excluir o local!', 'danger', 'tr');
       })
   };
@@ -161,24 +168,29 @@ class Locations extends React.Component {
                 </CardIcon>
                 <h3 className={classes.cardTitle}>Locais</h3>
               </CardHeader>
-              <CardBody style={{ paddingTop: "0px" }}>
-                <DataTable
-                  action={["edit", "delete"]}
-                  tableHeaderColor="success"
-                  tableHead={[
-                    { label: 'ID', key: 'id' },
-                    { label: 'Nome', key: 'name' },
-                    { label: 'Descrição', key: 'description' },
-                    { label: 'Max. Temp.', key: 'max_temperature' },
-                    { label: 'Min. Temp.', key: 'min_temperature' },
-                    { label: 'Max. Umi.', key: 'max_humidity' },
-                    { label: 'Min. Umi.', key: 'min_humidity' },
-                    { label: 'Última alteração', key: 'updated_at' }
-                  ]}
-                  tableData={this.state.locations || []}
-                  openModal={this.openEditModal}
-                  deleteItem={this.handleOpenConfirmDelete}
-                />
+              <CardBody style={{ paddingTop: "0px" }} align="center">
+                {
+                  this.state.loading
+                    ? <Loading />
+                    :
+                    <DataTable
+                      action={["edit", "delete"]}
+                      tableHeaderColor="success"
+                      tableHead={[
+                        { label: 'ID', key: 'id' },
+                        { label: 'Nome', key: 'name' },
+                        { label: 'Descrição', key: 'description' },
+                        { label: 'Max. Temp.', key: 'max_temperature' },
+                        { label: 'Min. Temp.', key: 'min_temperature' },
+                        { label: 'Max. Umi.', key: 'max_humidity' },
+                        { label: 'Min. Umi.', key: 'min_humidity' },
+                        { label: 'Última alteração', key: 'updated_at' }
+                      ]}
+                      tableData={this.state.locations || []}
+                      openModal={this.openEditModal}
+                      deleteItem={this.handleOpenConfirmDelete}
+                    />
+                }
               </CardBody>
             </Card>
           </GridItem>

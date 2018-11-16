@@ -21,18 +21,16 @@ import FormValidator from "../../validations/FormValidator";
 
 import LocationService from "../../services/locations";
 
-
 const initialState = {
-  name: '',
-  description: '',
-  max_humidity: '',
-  min_humidity: '',
-  max_temperature: '',
-  min_temperature: '',
-  max_leafWetness: '',
-  min_leafWetness: ''
+  name: "",
+  description: "",
+  max_humidity: "",
+  min_humidity: "",
+  max_temperature: "",
+  min_temperature: "",
+  max_leafWetness: "",
+  min_leafWetness: ""
 };
-
 
 function Transition(props) {
   return <Slide direction="down" {...props} />;
@@ -44,16 +42,16 @@ class LocationsFormModal extends React.Component {
     this.locationService = new LocationService();
     this.validator = new FormValidator([
       {
-        field: 'name',
-        method: 'isEmpty',
+        field: "name",
+        method: "isEmpty",
         validWhen: false,
-        message: 'Campo obrigatório'
+        message: "Campo obrigatório"
       },
       {
-        field: 'description',
-        method: 'isEmpty',
+        field: "description",
+        method: "isEmpty",
         validWhen: false,
-        message: 'Campo obrigatório'
+        message: "Campo obrigatório"
       }
     ]);
     this.state = { ...initialState, validation: this.validator.valid() };
@@ -62,27 +60,26 @@ class LocationsFormModal extends React.Component {
 
   componentDidUpdate = async () => {
     if (this.props.modalType === "Editar" && this.props.open === true) {
-      if (this.state.name === '' && this.state.description === '') {
-        await this.locationService.getOne(this.props.locationId)
+      if (this.state.name === "" && this.state.description === "") {
+        await this.locationService
+          .getOne(this.props.locationId)
           .then(({ data }) => {
-            this.setState(
-              {
-                name: data.name,
-                description: data.description,
-                max_humidity: data.max_humidity,
-                min_humidity: data.min_humidity,
-                max_temperature: data.max_temperature,
-                min_temperature: data.min_temperature,
-                max_leafWetness: data.max_leafWetness,
-                min_leafWetness: data.min_leafWetness
-              }
-            );
+            this.setState({
+              name: data.name,
+              description: data.description,
+              max_humidity: data.max_humidity,
+              min_humidity: data.min_humidity,
+              max_temperature: data.max_temperature,
+              min_temperature: data.min_temperature,
+              max_leafWetness: data.max_leafWetness,
+              min_leafWetness: data.min_leafWetness
+            });
           });
       }
     }
   };
 
-  formCreateSubmit = async (event) => {
+  formCreateSubmit = async event => {
     event.preventDefault();
 
     const validation = this.validator.validate(this.state);
@@ -105,31 +102,51 @@ class LocationsFormModal extends React.Component {
 
       formData.append("name", name);
       formData.append("description", description);
-      formData.append("max_humidity", max_humidity);
-      formData.append("min_humidity", min_humidity);
-      formData.append("max_temperature", max_temperature);
-      formData.append("min_temperature", min_temperature);
-      formData.append("max_leafWetness", max_leafWetness);
-      formData.append("min_leafWetness", min_leafWetness);
 
-      await this.locationService.create(formData)
+      if (!!max_humidity) {
+        formData.append("max_humidity", max_humidity);
+      }
+
+      if (!!min_humidity) {
+        formData.append("min_humidity", min_humidity);
+      }
+
+      if (!!max_temperature) {
+        formData.append("max_temperature", max_temperature);
+      }
+
+      if (!!min_temperature) {
+        formData.append("min_temperature", min_temperature);
+      }
+
+      // formData.append("max_leafWetness", max_leafWetness);
+      // formData.append("min_leafWetness", min_leafWetness);
+
+      await this.locationService
+        .create(formData)
         .then(() => {
           this.submited = false;
 
           this.setState(initialState);
 
           this.props.handleClose();
-          this.props.showNotification('Local cadastrado com sucesso', 'success', 'tr');
+          this.props.showNotification(
+            "Local cadastrado com sucesso",
+            "success",
+            "tr"
+          );
         })
         .catch(() => {
-          this.props.showNotification('Não foi possível realizar o cadastro', 'danger', 'tr');
+          this.props.showNotification(
+            "Não foi possível realizar o cadastro",
+            "danger",
+            "tr"
+          );
         });
-
     }
-
   };
 
-  formEditSubmit = async (event) => {
+  formEditSubmit = async event => {
     event.preventDefault();
 
     const validation = this.validator.validate(this.state);
@@ -153,33 +170,55 @@ class LocationsFormModal extends React.Component {
       formData.append("id", this.props.locationId);
       formData.append("name", name);
       formData.append("description", description);
-      formData.append("max_humidity", max_humidity);
-      formData.append("min_humidity", min_humidity);
-      formData.append("max_temperature", max_temperature);
-      formData.append("min_temperature", min_temperature);
-      formData.append("max_leafWetness", max_leafWetness);
-      formData.append("min_leafWetness", min_leafWetness);
 
-      await this.locationService.update(formData)
+      if (!!max_humidity) {
+        formData.append("max_humidity", max_humidity);
+      }
+
+      if (!!min_humidity) {
+        formData.append("min_humidity", min_humidity);
+      }
+
+      if (!!max_temperature) {
+        formData.append("max_temperature", max_temperature);
+      }
+
+      if (!!min_temperature) {
+        formData.append("min_temperature", min_temperature);
+      }
+      // formData.append("max_leafWetness", max_leafWetness);
+      // formData.append("min_leafWetness", min_leafWetness);
+
+      await this.locationService
+        .update(formData)
         .then(() => {
           this.submited = false;
 
           this.setState(initialState);
 
           this.props.handleClose();
-          this.props.showNotification('Local atualizado com sucesso', 'success', 'tr');
+          this.props.showNotification(
+            "Local atualizado com sucesso",
+            "success",
+            "tr"
+          );
         })
         .catch(() => {
-          this.props.showNotification('Não foi possível atualizar o cadastro', 'danger', 'tr');
+          this.props.showNotification(
+            "Não foi possível atualizar o cadastro",
+            "danger",
+            "tr"
+          );
         });
     }
-
   };
 
-  handleInputChange = (event) => {
+  handleInputChange = event => {
     event.preventDefault();
 
-    this.setState({ [event.target.id]: event.target.value }, () => { console.log(this.state) });
+    this.setState({ [event.target.id]: event.target.value }, () => {
+      // console.log(this.state);
+    });
   };
 
   handleCancel = () => {
@@ -202,7 +241,9 @@ class LocationsFormModal extends React.Component {
       min_leafWetness
     } = this.state;
 
-    const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
+    const validation = this.submited
+      ? this.validator.validate(this.state)
+      : this.state.validation;
 
     return (
       <div>
@@ -223,7 +264,9 @@ class LocationsFormModal extends React.Component {
         >
           <Card>
             <CardHeader color="success">
-              <center><h4>{`${modalType} Local`}</h4></center>
+              <center>
+                <h4>{`${modalType} Local`}</h4>
+              </center>
             </CardHeader>
             <form autoComplete="off">
               <CardBody>
@@ -243,7 +286,7 @@ class LocationsFormModal extends React.Component {
                         autoFocus: true,
                         value: name,
                         onChange: this.handleInputChange,
-                        type: "text",
+                        type: "text"
                       }}
                     />
                   </GridItem>
@@ -266,7 +309,7 @@ class LocationsFormModal extends React.Component {
                         rowsMax: 2,
                         value: description,
                         onChange: this.handleInputChange,
-                        type: "text",
+                        type: "text"
                       }}
                     />
                   </GridItem>
@@ -282,7 +325,7 @@ class LocationsFormModal extends React.Component {
                       inputProps={{
                         value: max_temperature,
                         onChange: this.handleInputChange,
-                        type: "number",
+                        type: "number"
                       }}
                     />
                   </GridItem>
@@ -296,7 +339,7 @@ class LocationsFormModal extends React.Component {
                       inputProps={{
                         value: max_humidity,
                         onChange: this.handleInputChange,
-                        type: "number",
+                        type: "number"
                       }}
                     />
                   </GridItem>
@@ -310,7 +353,7 @@ class LocationsFormModal extends React.Component {
                       inputProps={{
                         value: max_leafWetness,
                         onChange: this.handleInputChange,
-                        type: "number",
+                        type: "number"
                       }}
                     />
                   </GridItem>
@@ -326,7 +369,7 @@ class LocationsFormModal extends React.Component {
                       inputProps={{
                         value: min_temperature,
                         onChange: this.handleInputChange,
-                        type: "number",
+                        type: "number"
                       }}
                     />
                   </GridItem>
@@ -340,7 +383,7 @@ class LocationsFormModal extends React.Component {
                       inputProps={{
                         value: min_humidity,
                         onChange: this.handleInputChange,
-                        type: "number",
+                        type: "number"
                       }}
                     />
                   </GridItem>
@@ -354,34 +397,42 @@ class LocationsFormModal extends React.Component {
                       inputProps={{
                         value: min_leafWetness,
                         onChange: this.handleInputChange,
-                        type: "number",
+                        type: "number"
                       }}
                     />
                   </GridItem>
                 </Grid>
               </CardBody>
               <CardFooter style={{ display: "block" }} align="right">
-                <Button type="button" color="danger" onClick={this.handleCancel}>
+                <Button
+                  type="button"
+                  color="danger"
+                  onClick={this.handleCancel}
+                >
                   <Close />
                 </Button>
-                <Button type="button" color="success" onClick={
-                  modalType === "Cadastrar"
-                    ? this.formCreateSubmit
-                    : this.formEditSubmit
-                }>
+                <Button
+                  type="button"
+                  color="success"
+                  onClick={
+                    modalType === "Cadastrar"
+                      ? this.formCreateSubmit
+                      : this.formEditSubmit
+                  }
+                >
                   <Save />
                 </Button>
               </CardFooter>
             </form>
           </Card>
         </Dialog>
-      </div >
+      </div>
     );
   }
 }
 
 LocationsFormModal.propTypes = {
-  modalType: PropTypes.oneOf(["Cadastrar", "Editar", ""]),
+  modalType: PropTypes.oneOf(["Cadastrar", "Editar", ""])
 };
 
 export default LocationsFormModal;

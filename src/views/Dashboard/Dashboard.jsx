@@ -70,7 +70,7 @@ class Dashboard extends React.PureComponent {
     await this.measurementService
       .getMeasurementList(id, qtde)
       .then(({ data }) => {
-        console.log(data);
+        // console.log(data);
         this.setDataChart(data);
       });
   };

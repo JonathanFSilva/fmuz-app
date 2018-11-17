@@ -9,20 +9,19 @@ var Chartist = require("chartist");
 
 require("chartist-plugin-tooltips");
 
-
 const LineChart = ({ ...props }) => {
   const { data, labelY, serie } = props;
 
   const options = {
     axisY: {
       offset: 50,
-      labelInterpolationFnc: function (value) {
+      labelInterpolationFnc: function(value) {
         return `${parseFloat(value).toFixed(1)}${labelY}`;
       }
     },
     axisX: {
       offset: 10,
-      labelInterpolationFnc: function (value) {
+      labelInterpolationFnc: function(value) {
         return; //Moment(value).format('HH:mm');
       }
     },
@@ -31,8 +30,9 @@ const LineChart = ({ ...props }) => {
     }),
     plugins: [
       Chartist.plugins.tooltip({
-        anchorToPoint: true,
-        transformTooltipTextFnc: function (value) {
+        appendToBody: false,
+        anchorToPoint: false,
+        transformTooltipTextFnc: function(value) {
           return `${serie}: ${value}${labelY}`;
         }
       })
@@ -61,7 +61,7 @@ const LineChart = ({ ...props }) => {
   // ];
 
   const animation = {
-    draw: function (data) {
+    draw: function(data) {
       if (data.type === "line" || data.type === "area") {
         data.element.animate({
           d: {

@@ -313,12 +313,12 @@ img {
   background: rgba(0, 0, 0, 0.8) !important;
   color: #ffffff !important;
   border-radius: 0.25em;
-  font-size: 0.8em !important;
-  font-weight: 300 !important;
+  font-size: 1em !important;
+  font-weight: 500 !important;
   text-align: center;
   padding: 10px 15px !important;
-  min-width: 140px !important;
-  max-width: 220px !important;
+  min-width: 170px !important;
+  max-width: 200px !important;
 }
 
 .chartist-tooltip:before {

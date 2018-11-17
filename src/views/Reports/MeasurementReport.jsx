@@ -5,7 +5,7 @@ import FormData from "form-data";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
 // import Tooltip from "@material-ui/core/Tooltip";
-
+import AddAlert from "@material-ui/icons/AddAlert";
 import Search from "@material-ui/icons/Search";
 // core components
 import Button from "../../components/CustomButtons/Button";
@@ -16,6 +16,7 @@ import DatePicker from "../../components/DatePicker/DatePicker";
 import GridItem from "../../components/Grid/GridItem";
 import Loading from "../../components/Loading/Loading";
 import SelectInput from "../../components/SelectInput/SelectInput";
+import Snackbar from "../../components/Snackbar/Snackbar";
 
 import FormValidator from "../../validations/FormValidator";
 import ReportService from "../../services/reports";
@@ -24,19 +25,20 @@ import withAuthentication from "../../hocs/withAuthentication";
 
 import dashboardStyle from "../../assets/jss/fruticulture/views/dashboardStyle.jsx";
 
-
-const Moment = require('moment');
-
+const Moment = require("moment");
 
 const initialState = {
   beginDate: Moment(),
   endDate: Moment(),
   measurementReport: [],
   locations: [],
-  location_id: '',
+  location_id: "",
   loading: false,
+  notificationOpen: false,
+  notificationColor: "danger",
+  notificationPlace: "tr",
+  notificationMessage: ""
 };
-
 
 class MeasurementReport extends React.PureComponent {
   constructor() {
@@ -45,69 +47,64 @@ class MeasurementReport extends React.PureComponent {
     this.reportService = new ReportService();
     this.validator = new FormValidator([
       {
-        field: 'beginDate',
-        method: 'isEmpty',
+        field: "beginDate",
+        method: "isEmpty",
         validWhen: false,
-        message: 'Campo obrigatório'
+        message: "Campo obrigatório"
       },
       {
-        field: 'endDate',
-        method: 'isEmpty',
+        field: "endDate",
+        method: "isEmpty",
         validWhen: false,
-        message: 'Campo obrigatório'
+        message: "Campo obrigatório"
       },
       {
-        field: 'endDate',
+        field: "endDate",
         method: this.validEndDate,
         validWhen: true,
-        message: 'Data final deve ser maior ou igual a data de inicio'
+        message: "Data final deve ser maior ou igual a data de inicio"
       },
       {
-        field: 'location_id',
-        method: 'isEmpty',
+        field: "location_id",
+        method: "isEmpty",
         validWhen: false,
-        message: 'Campo obrigatório'
+        message: "Campo obrigatório"
       }
     ]);
     this.state = { ...initialState, validation: this.validator.valid() };
     this.submited = false;
-  };
+  }
 
   componentWillMount = async () => {
     await this.getAllLocations();
 
-    const params = JSON.parse(localStorage.getItem('@App:report'));
+    const params = JSON.parse(localStorage.getItem("@App:report"));
 
     if (!!params) {
-      await this.setState(
-        {
-          location_id: params.location_id,
-          endDate: Moment(params.endDate),
-          beginDate: Moment(params.beginDate)
-        }
-      );
+      await this.setState({
+        location_id: params.location_id,
+        endDate: Moment(params.endDate),
+        beginDate: Moment(params.beginDate)
+      });
     }
 
     this.filter();
   };
 
-  componentWillUnmount = () => {
-    console.log('unmounting...');
-  }
+  validEndDate = (endDate, state) =>
+    Moment(endDate).diff(state.beginDate, "days") >= 0;
 
-  validEndDate = (endDate, state) => (Moment(endDate).diff(state.beginDate, 'days') >= 0);
-
-  handleLocationChange = (event) => {
+  handleLocationChange = event => {
     event.preventDefault();
 
     this.setState({ location_id: event.target.value });
   };
 
-  handleBeginDateChange = (date) => {
+  handleBeginDateChange = date => {
     this.setState({ beginDate: date });
   };
 
-  handleEndDateChange = (date) => {
+  handleEndDateChange = date => {
     this.setState({ endDate: date });
   };
 
@@ -124,12 +121,19 @@ class MeasurementReport extends React.PureComponent {
       const formData = new FormData();
 
       formData.append("location_id", location_id);
-      formData.append("beginDate", Moment(beginDate).format("YYYY-MM-DD HH:mm"));
-      formData.append("endDate", Moment(endDate).format("YYYY-MM-DD HH:mm"));
+      formData.append(
+        "beginDate",
+        `${Moment(beginDate).format("YYYY-MM-DD")} 00:00:00`
+      );
+      formData.append(
+        "endDate",
+        `${Moment(endDate).format("YYYY-MM-DD")} 23:59:59`
+      );
 
       this.saveReportParams();
 
-      await this.reportService.measurementReport(formData)
+      await this.reportService
+        .measurementReport(formData)
         .then(({ data }) => {
           this.submited = false;
 
@@ -139,36 +143,52 @@ class MeasurementReport extends React.PureComponent {
             result.push({
               date: Moment(item.created_at).format("DD/MM/YYYY"),
               humidity: `${item.humidity.toFixed(2)}%`,
-              leafWetness: `${item.leafWetness.toFixed(2)}%`,
-              temperature: `${item.temperature.toFixed(2)}ºC`,
+              // leafWetness: `${item.leafWetness.toFixed(2)}%`,
+              temperature: `${item.temperature.toFixed(2)}ºC`
             });
             return true;
           });
 
           this.setState({ loading: false, measurementReport: result });
         })
-        .catch((err) => {
+        .catch(err => {
           // console.log(err);
           this.setState({ loading: false });
-          this.props.showNotification('Não foi possível gerar o relatório.', 'danger', 'tr');
-        })
+          this.props.showNotification(
+            "Não foi possível gerar o relatório.",
+            "danger",
+            "tr"
+          );
+        });
     }
   };
 
-  getAllLocations = async () => {
-    await this.locationService.getAll()
-      .then(({ data }) => {
-        const locations = [];
+  showNotification = (message, color, place = "tr") => {
+    this.setState({
+      notificationOpen: true,
+      notificationMessage: message,
+      notificationColor: color,
+      notificationPlace: place
+    });
 
-        data.forEach((item) => {
-          locations.push([item.id, item.name]);
-        });
-
-        this.setState({ locations, location_id: locations[0][0] });
-      });
+    setTimeout(() => {
+      this.setState({ notificationOpen: false, notificationMessage: "" });
+    }, 6000);
   };
 
-  showDetails = (prop) => {
+  getAllLocations = async () => {
+    await this.locationService.getAll().then(({ data }) => {
+      const locations = [];
+
+      data.forEach(item => {
+        locations.push([item.id, item.name]);
+      });
+
+      this.setState({ locations, location_id: locations[0][0] });
+    });
+  };
+
+  showDetails = prop => {
     const id = this.state.location_id;
 
     const date = Moment(prop.date, "DD/MM/YYYY").format("YYYY-MM-DD");
@@ -180,22 +200,40 @@ class MeasurementReport extends React.PureComponent {
   saveReportParams = () => {
     const { beginDate, endDate, location_id } = this.state;
 
-    localStorage.setItem('@App:report', JSON.stringify(
-      {
+    localStorage.setItem(
+      "@App:report",
+      JSON.stringify({
         endDate: Moment(endDate).format("YYYY-MM-DD"),
         beginDate: Moment(beginDate).format("YYYY-MM-DD"),
         location_id: location_id
-      }
-    ));
+      })
+    );
   };
 
   render() {
     // const { classes } = this.props;
-    const { beginDate, endDate, location_id, locations, measurementReport } = this.state;
-    const validation = this.submited ? this.validator.validate(this.state) : this.state.validation;
+    const {
+      beginDate,
+      endDate,
+      location_id,
+      locations,
+      measurementReport
+    } = this.state;
+    const validation = this.submited
+      ? this.validator.validate(this.state)
+      : this.state.validation;
 
     return (
       <div>
+        <Snackbar
+          place={this.state.notificationPlace}
+          color={this.state.notificationColor}
+          message={this.state.notificationMessage}
+          icon={AddAlert}
+          open={this.state.notificationOpen}
+          closeNotification={() => this.setState({ notificationOpen: false })}
+          close
+        />
         <Card>
           <CardBody>
             <Grid container justify="flex-start">
@@ -208,12 +246,12 @@ class MeasurementReport extends React.PureComponent {
                   formControlProps={{
                     error: validation.beginDate.isInvalid,
                     required: true,
-                    fullWidth: true,
+                    fullWidth: true
                   }}
                   inputProps={{
                     value: beginDate,
                     onChange: this.handleBeginDateChange,
-                    type: "text",
+                    type: "text"
                   }}
                 />
               </GridItem>
@@ -226,12 +264,12 @@ class MeasurementReport extends React.PureComponent {
                   formControlProps={{
                     error: validation.endDate.isInvalid,
                     required: true,
-                    fullWidth: true,
+                    fullWidth: true
                   }}
                   inputProps={{
                     value: endDate,
                     onChange: this.handleEndDateChange,
-                    type: "text",
+                    type: "text"
                   }}
                 />
               </GridItem>
@@ -244,7 +282,7 @@ class MeasurementReport extends React.PureComponent {
                   formControlProps={{
                     error: validation.location_id.isInvalid,
                     required: true,
-                    fullWidth: true,
+                    fullWidth: true
                   }}
                   inputProps={{
                     value: location_id,
@@ -258,7 +296,11 @@ class MeasurementReport extends React.PureComponent {
                 <Grid container justify="center" alignContent="center">
                   <GridItem>
                     {/* <Tooltip title="Gerar relatório" placement="top" classes={{ tooltip: classes.tooltip }}> */}
-                    <Button color="success" style={{ marginTop: '27px' }} onClick={this.filter}>
+                    <Button
+                      color="success"
+                      style={{ marginTop: "27px" }}
+                      onClick={this.filter}
+                    >
                       <Search />
                     </Button>
                     {/* </Tooltip> */}
@@ -271,23 +313,22 @@ class MeasurementReport extends React.PureComponent {
 
         <Card>
           <CardBody style={{ paddingTop: "0px" }} align="center">
-            {
-              this.state.loading
-                ? <Loading />
-                :
-                <DataTable
-                  action={["view"]}
-                  tableHeaderColor="success"
-                  tableHead={[
-                    { label: 'Data', key: 'date' },
-                    { label: 'Temperatura (ºC)', key: 'temperature' },
-                    { label: 'Umidade (%)', key: 'humidity' },
-                    { label: 'Molhamento Foliar (%)', key: 'leafWetness' }
-                  ]}
-                  tableData={measurementReport || []}
-                  showItem={this.showDetails}
-                />
-            }
+            {this.state.loading ? (
+              <Loading />
+            ) : (
+              <DataTable
+                action={["view"]}
+                tableHeaderColor="success"
+                tableHead={[
+                  { label: "Data", key: "date" },
+                  { label: "Temperatura (ºC)", key: "temperature" },
+                  { label: "Umidade (%)", key: "humidity" }
+                  // { label: "Molhamento Foliar (%)", key: "leafWetness" }
+                ]}
+                tableData={measurementReport || []}
+                showItem={this.showDetails}
+              />
+            )}
           </CardBody>
         </Card>
       </div>

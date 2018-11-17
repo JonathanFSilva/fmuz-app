@@ -93,9 +93,9 @@ class LocationsFormModal extends React.Component {
         max_temperature,
         min_temperature,
         max_humidity,
-        min_humidity,
-        max_leafWetness,
-        min_leafWetness
+        min_humidity
+        // max_leafWetness,
+        // min_leafWetness
       } = this.state;
 
       const formData = new FormData();
@@ -160,9 +160,9 @@ class LocationsFormModal extends React.Component {
         max_temperature,
         min_temperature,
         max_humidity,
-        min_humidity,
-        max_leafWetness,
-        min_leafWetness
+        min_humidity
+        // max_leafWetness,
+        // min_leafWetness
       } = this.state;
 
       const formData = new FormData();

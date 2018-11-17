@@ -18,8 +18,9 @@ import GridItem from "../../components/Grid/GridItem.jsx";
 import GridContainer from "../../components/Grid/GridContainer.jsx";
 // icons
 import humidity from "../../assets/img/icons/humidity.svg";
-import leaf from "../../assets/img/icons/leaf.svg";
+// import leaf from "../../assets/img/icons/leaf.svg";
 import thermometer from "../../assets/img/icons/thermometer.svg";
+import valve from "../../assets/img/icons/valve.svg";
 
 import LineChart from "./LineChart";
 import withAuthentication from "../../hocs/withAuthentication";
@@ -37,7 +38,8 @@ const initialState = {
   nodes: [{ id: undefined, mac: "", location: "" }],
   humiditys: [{ meta: "", value: undefined }],
   temperatures: [{ meta: "", value: undefined }],
-  leafWetness: [{ meta: "", value: undefined }],
+  // leafWetness: [{ meta: "", value: undefined }],
+  lastActivation: "",
   activeNode: 0
 };
 
@@ -64,7 +66,7 @@ class Dashboard extends React.PureComponent {
     setInterval(this.getMeasurementList, 60000);
   };
 
-  getMeasurementList = async (qtde = 30) => {
+  getMeasurementList = async (qtde = 50) => {
     const id = this.state.nodes[this.state.activeNode].id;
 
     await this.measurementService
@@ -80,25 +82,38 @@ class Dashboard extends React.PureComponent {
 
     const humiditys = [];
     const temperatures = [];
-    const leafWetness = [];
+    // const leafWetness = [];
 
-    data.forEach(item => {
+    data.measurements.forEach(item => {
+      var meta = Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss");
+      if (item.duration > 0) {
+        meta += "\n\rVálvula Acionada";
+      }
+
       labels.push(item.created_at);
       humiditys.push({
-        meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
+        meta: meta,
+        // meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
         value: item.humidity
       });
       temperatures.push({
-        meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
+        meta: meta,
         value: item.temperature
       });
-      leafWetness.push({
-        meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
-        value: item.leafWetness
-      });
+      // leafWetness.push({
+      //   meta: Moment(item.created_at).format("DD/MM/YYYY HH:mm:ss"),
+      //   value: item.leafWetness
+      // });
     });
 
-    this.setState({ labels, humiditys, temperatures, leafWetness });
+    this.setState({
+      labels,
+      humiditys,
+      temperatures /*leafWetness*/,
+      lastActivation: !!data.lastActivation
+        ? Moment(data.lastActivation).format("DD/MM/YYYY HH:mm:ss")
+        : "---"
+    });
   };
 
   handleChangeChart = (index, title, color) => {
@@ -123,7 +138,8 @@ class Dashboard extends React.PureComponent {
       labels,
       temperatures,
       humiditys,
-      leafWetness,
+      // leafWetness,
+      lastActivation,
       index,
       title,
       color,
@@ -198,27 +214,21 @@ class Dashboard extends React.PureComponent {
           <GridItem xs={12} sm={12} md={4}>
             <Card>
               <CardHeader color="success" stats icon>
-                <Tooltip
-                  title="Ver gráfico de Molhamento Foliar"
+                {/* <Tooltip
+                  title="Último acionamento da válvula."
                   placement="bottom"
                   classes={{ tooltip: classes.tooltip }}
+                > */}
+                <CardIcon color="success">
+                  <img alt="valve-icon" className="icon" src={valve} />
+                </CardIcon>
+                {/* </Tooltip> */}
+                <p className={classes.cardCategory}>Válvula</p>
+                <h3
+                  className={classes.cardCategory}
+                  style={{ fontWeight: "bold" }}
                 >
-                  <CardIcon
-                    color="success"
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      this.handleChangeChart(3, "Molhamento Foliar", "success")
-                    }
-                  >
-                    <img alt="leaf-wetness-icon" className="icon" src={leaf} />
-                  </CardIcon>
-                </Tooltip>
-                <p className={classes.cardCategory}>Molhamento</p>
-                <h3 className={classes.cardTitle}>
-                  {!!leafWetness
-                    ? leafWetness[leafWetness.length - 1].value
-                    : ""}
-                  %
+                  {!!lastActivation ? lastActivation : "---"}
                 </h3>
               </CardHeader>
               <CardFooter />
@@ -247,13 +257,13 @@ class Dashboard extends React.PureComponent {
                     serie="Umidade"
                   />
                 ) : null}
-                {index === 3 && !!leafWetness ? (
+                {/* {index === 3 && !!leafWetness ? (
                   <LineChart
                     data={{ labels, series: [leafWetness] } || {}}
                     labelY="%"
                     serie="Molhamento Foliar"
                   />
-                ) : null}
+                ) : null} */}
               </CardHeader>
               <CardBody>
                 <p className={classes.cardCategory}>Localização</p>
